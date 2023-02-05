@@ -183,11 +183,11 @@ impl Raytracer {
 
     fn save_image(&mut self, img: RgbImage, versionize: bool) {
         let mut path_buf = std::path::PathBuf::new();
+        if !std::path::Path::new(self.path_output).exists() {
+            std::fs::create_dir(self.path_output).unwrap();
+        }
         path_buf.push(self.path_output);
         if versionize {
-            if !std::path::Path::new(self.path_output).exists() {
-                std::fs::create_dir(self.path_output).unwrap();
-            }
             let year = chrono::Local::now().year();
             let month = chrono::Local::now().month();
             let day = chrono::Local::now().day();
