@@ -1,5 +1,4 @@
 .vscode
 out/*
-out.png
 target
 Cargo.lock
