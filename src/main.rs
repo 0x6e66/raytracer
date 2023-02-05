@@ -17,7 +17,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("600")
                 .validator(is_u32)
-                .help("Width of the image (defalut: 600)"),
+                .help("Width of the image"),
         )
         .arg(
             Arg::with_name("height")
@@ -26,7 +26,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("400")
                 .validator(is_u32)
-                .help("Height of the image (defalut: 400)"),
+                .help("Height of the image"),
         )
         .arg(
             Arg::with_name("output_path")
@@ -34,7 +34,7 @@ fn main() {
                 .long("output")
                 .takes_value(true)
                 .default_value("out")
-                .help("Path where to store results (defalut: 'out'; creates folder if not found)"),
+                .help("Path where to store results (creates folder if not found)"),
         )
         .arg(
             Arg::with_name("versionize")
