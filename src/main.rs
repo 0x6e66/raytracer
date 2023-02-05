@@ -157,7 +157,7 @@ fn is_valid_preset(s: String) -> Result<(), String> {
     let parsed = s.parse::<u32>();
     match parsed {
         Err(_) => return Err(String::from("The value is not an unsigned integer")),
-        Ok(_) => true,
+        Ok(_) => ()
     };
 
     let value = parsed.unwrap();
