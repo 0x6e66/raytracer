@@ -17,7 +17,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("600")
                 .validator(is_u32)
-                .help("Width of the image")
+                .help("Width of the image"),
         )
         .arg(
             Arg::with_name("height")
@@ -26,7 +26,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("400")
                 .validator(is_u32)
-                .help("Height of the image")
+                .help("Height of the image"),
         )
         .arg(
             Arg::with_name("output_path")
@@ -34,13 +34,13 @@ fn main() {
                 .long("output")
                 .takes_value(true)
                 .default_value("out")
-                .help("Path where to store results (creates folder if not found)")
+                .help("Path where to store results (creates folder if not found)"),
         )
         .arg(
             Arg::with_name("versionize")
                 .long("versionize")
                 .takes_value(false)
-                .help("If set output images are being saved with the datetime as prefix")
+                .help("If set output images are being saved with the datetime as prefix"),
         )
         .arg(
             Arg::with_name("max_depth")
@@ -49,7 +49,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("4")
                 .validator(is_u32)
-                .help("Max. depth of reflected rays")
+                .help("Max. depth of reflected rays"),
         )
         .arg(
             Arg::with_name("anti_aliasing")
@@ -58,7 +58,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("2")
                 .validator(is_u32)
-                .help("Set scale of anti aliasing (number of rays per pixel = <argument> ^ 2)")
+                .help("Set scale of anti aliasing (number of rays per pixel = <argument> ^ 2)"),
         )
         .arg(
             Arg::with_name("occlusion_offset")
@@ -66,7 +66,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("0.1")
                 .validator(is_f32)
-                .help("Offset for mitigation occlusion")
+                .help("Offset for mitigation occlusion"),
         )
         .arg(
             Arg::with_name("fov")
@@ -74,16 +74,16 @@ fn main() {
                 .takes_value(true)
                 .default_value("1.0")
                 .validator(is_f32)
-                .help("Field of view")
+                .help("Field of view"),
         )
         .arg(
             Arg::with_name("preset")
-            .short("p")
-            .long("preset")
-            .takes_value(true)
-            .default_value("1")
-            .validator(is_valid_preset)
-            .help("Select preset [1-4]")
+                .short("p")
+                .long("preset")
+                .takes_value(true)
+                .default_value("1")
+                .validator(is_valid_preset)
+                .help("Select preset [1-4]"),
         )
         .get_matches();
 
@@ -95,9 +95,21 @@ fn start_raytracer(matches: ArgMatches) {
     let height = matches.value_of("height").unwrap().parse::<u32>().unwrap();
     let output_path = matches.value_of("output_path").unwrap().to_string();
     let versionize = matches.is_present("versionize");
-    let max_depth = matches.value_of("max_depth").unwrap().parse::<u32>().unwrap();
-    let anti_aliasing = matches.value_of("anti_aliasing").unwrap().parse::<u32>().unwrap();
-    let occlusion_offset = matches.value_of("occlusion_offset").unwrap().parse::<f32>().unwrap();
+    let max_depth = matches
+        .value_of("max_depth")
+        .unwrap()
+        .parse::<u32>()
+        .unwrap();
+    let anti_aliasing = matches
+        .value_of("anti_aliasing")
+        .unwrap()
+        .parse::<u32>()
+        .unwrap();
+    let occlusion_offset = matches
+        .value_of("occlusion_offset")
+        .unwrap()
+        .parse::<f32>()
+        .unwrap();
     let fov = matches.value_of("fov").unwrap().parse::<f32>().unwrap();
     let preset = matches.value_of("preset").unwrap().parse::<u32>().unwrap();
 
@@ -105,7 +117,7 @@ fn start_raytracer(matches: ArgMatches) {
         1 => setup::get_spheres_lights_1(),
         2 => setup::get_spheres_lights_2(),
         3 => setup::get_spheres_lights_3(),
-        _ => setup::get_spheres_lights_1()
+        _ => setup::get_spheres_lights_1(),
     };
     let mut tracer = raytracer::Raytracer::new(
         (width, height),
@@ -148,7 +160,7 @@ fn is_valid_preset(s: String) -> Result<(), String> {
         Ok(_) => true,
     };
 
-    let value = parsed.unwrap(); 
+    let value = parsed.unwrap();
     if 1 <= value && value <= 3 {
         return Ok(());
     }
