@@ -1,4 +1,4 @@
-use crate::utils::{vec3, Material, Sphere, Light};
+use crate::utils::{vec3, Light, Material, Sphere};
 use chrono::{Datelike, Timelike};
 use image::RgbImage;
 
@@ -13,7 +13,7 @@ pub struct Raytracer {
     offset_for_mitigating_occlusion: f32,
     anti_aliasing_offsets: Vec<(f32, f32)>,
     fov: f32,
-    path_output: &'static str,
+    path_output: String,
     spheres: Vec<Sphere>,
     lights: Vec<Light>,
 }
@@ -22,14 +22,14 @@ impl Raytracer {
     pub fn new(
         resolution: (u32, u32),
         floor_dimensions: (f32, f32),
-        background_color: vec3,
-        floor_color: vec3,
+        background_color: (u32, u32, u32),
+        floor_color: (u32, u32, u32),
         floor_level: f32,
         max_depth: u32,
         offset_for_mitigating_occlusion: f32,
         anti_aliasing: u32,
         fov: f32,
-        path_output: &'static str,
+        path_output: String,
         spheres: Vec<Sphere>,
         lights: Vec<Light>,
     ) -> Raytracer {
@@ -46,8 +46,16 @@ impl Raytracer {
             width: resolution.0,
             height: resolution.1,
             floor_dimensions: floor_dimensions,
-            background_color: background_color / 255.0,
-            floor_color: floor_color / 255.0,
+            background_color: vec3 {
+                x: background_color.0 as f32,
+                y: background_color.1 as f32,
+                z: background_color.2 as f32,
+            } / 255.0,
+            floor_color: vec3 {
+                x: floor_color.0 as f32,
+                y: floor_color.1 as f32,
+                z: floor_color.2 as f32,
+            } / 255.0,
             floor_level: floor_level,
             max_depth: max_depth,
             offset_for_mitigating_occlusion: offset_for_mitigating_occlusion,
@@ -183,10 +191,10 @@ impl Raytracer {
 
     fn save_image(&mut self, img: RgbImage, versionize: bool) {
         let mut path_buf = std::path::PathBuf::new();
-        if !std::path::Path::new(self.path_output).exists() {
-            std::fs::create_dir(self.path_output).unwrap();
+        if !std::path::Path::new(self.path_output.as_str()).exists() {
+            std::fs::create_dir(self.path_output.as_str()).unwrap();
         }
-        path_buf.push(self.path_output);
+        path_buf.push(self.path_output.as_str());
         if versionize {
             let year = chrono::Local::now().year();
             let month = chrono::Local::now().month();
