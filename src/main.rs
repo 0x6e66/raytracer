@@ -83,7 +83,7 @@ fn main() {
                 .takes_value(true)
                 .default_value("1")
                 .validator(is_valid_preset)
-                .help("Select preset [1-4]"),
+                .help("Select preset [1-3]"),
         )
         .get_matches();
 
