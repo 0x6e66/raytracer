@@ -1,4 +1,3 @@
-
 use crate::utils::{vec3, Light, Material, Sphere};
 use std::collections::HashMap;
 
@@ -140,75 +139,6 @@ pub fn get_spheres_lights_1() -> (Vec<Sphere>, Vec<Light>) {
     let mut spheres: Vec<Sphere> = Vec::new();
     spheres.push(Sphere::new(
         vec3 {
-            x: -3.0,
-            y: 0.0,
-            z: -16.0,
-        },
-        2.0,
-        materials["ivory"],
-    ));
-    spheres.push(Sphere::new(
-        vec3 {
-            x: -1.0,
-            y: -1.5,
-            z: -12.0,
-        },
-        2.0,
-        materials["glass"],
-    ));
-    spheres.push(Sphere::new(
-        vec3 {
-            x: 1.5,
-            y: -0.5,
-            z: -18.0,
-        },
-        3.0,
-        materials["amber"],
-    ));
-    spheres.push(Sphere::new(
-        vec3 {
-            x: 7.0,
-            y: 5.0,
-            z: -18.0,
-        },
-        4.0,
-        materials["mirror"],
-    ));
-    let mut lights: Vec<Light> = Vec::new();
-    lights.push(Light::new(
-        vec3 {
-            x: -20.0,
-            y: 20.0,
-            z: 20.0,
-        },
-        1.0,
-    ));
-    lights.push(Light::new(
-        vec3 {
-            x: 30.0,
-            y: 50.0,
-            z: -25.0,
-        },
-        1.0,
-    ));
-    lights.push(Light::new(
-        vec3 {
-            x: 30.0,
-            y: 20.0,
-            z: 30.0,
-        },
-        1.0,
-    ));
-    return (spheres, lights);
-}
-
-#[allow(dead_code)]
-pub fn get_spheres_lights_2() -> (Vec<Sphere>, Vec<Light>) {
-    let materials = get_materials();
-
-    let mut spheres: Vec<Sphere> = Vec::new();
-    spheres.push(Sphere::new(
-        vec3 {
             x: 0.0,
             y: -1.5,
             z: -20.0,
@@ -273,7 +203,7 @@ pub fn get_spheres_lights_2() -> (Vec<Sphere>, Vec<Light>) {
 }
 
 #[allow(dead_code)]
-pub fn get_spheres_lights_3() -> (Vec<Sphere>, Vec<Light>) {
+pub fn get_spheres_lights_2() -> (Vec<Sphere>, Vec<Light>) {
     let materials = get_materials();
 
     let mut spheres: Vec<Sphere> = Vec::new();
@@ -327,7 +257,7 @@ pub fn get_spheres_lights_3() -> (Vec<Sphere>, Vec<Light>) {
 }
 
 #[allow(dead_code)]
-pub fn get_spheres_lights_4() -> (Vec<Sphere>, Vec<Light>) {
+pub fn get_spheres_lights_3() -> (Vec<Sphere>, Vec<Light>) {
     let materials = get_materials();
 
     let mut spheres: Vec<Sphere> = Vec::new();
