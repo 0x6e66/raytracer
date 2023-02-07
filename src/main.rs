@@ -127,7 +127,6 @@ fn start_raytracer(matches: ArgMatches) {
     let mut tracer = raytracer::Raytracer::new(
         (width, height),
         (10.0, 40.0),
-        (53, 108, 160),
         (230, 102, 30),
         -4.0,
         max_depth,

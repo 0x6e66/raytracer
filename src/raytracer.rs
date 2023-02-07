@@ -6,7 +6,6 @@ pub struct Raytracer {
     width: u32,
     height: u32,
     floor_dimensions: (f32, f32),
-    background_color: vec3,
     floor_color: vec3,
     floor_level: f32,
     max_depth: u32,
@@ -22,7 +21,6 @@ impl Raytracer {
     pub fn new(
         resolution: (u32, u32),
         floor_dimensions: (f32, f32),
-        background_color: (u32, u32, u32),
         floor_color: (u32, u32, u32),
         floor_level: f32,
         max_depth: u32,
@@ -46,11 +44,6 @@ impl Raytracer {
             width: resolution.0,
             height: resolution.1,
             floor_dimensions: floor_dimensions,
-            background_color: vec3 {
-                x: background_color.0 as f32,
-                y: background_color.1 as f32,
-                z: background_color.2 as f32,
-            } / 255.0,
             floor_color: vec3 {
                 x: floor_color.0 as f32,
                 y: floor_color.1 as f32,
@@ -155,7 +148,8 @@ impl Raytracer {
     fn cast_ray(&mut self, origin: vec3, direction: vec3, depth: u32) -> vec3 {
         let (hit, point, normal, material) = self.scene_intersect(origin, direction);
         if depth > self.max_depth || !hit {
-            return self.background_color;
+            let bc = direction.y / 2.0 + 0.3;
+            return vec3 {x:bc, y:bc, z:bc};
         }
 
         let direction_of_reflection = self.reflect(direction, normal).normalize();
