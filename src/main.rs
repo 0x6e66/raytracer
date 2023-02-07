@@ -8,6 +8,12 @@ mod utils;
 use clap::{App, Arg, ArgMatches};
 
 fn main() {
+    let matches = get_matches();
+
+    start_raytracer(matches);
+}
+
+fn get_matches() -> ArgMatches<'static> {
     let matches = App::new("Raytracer in rust")
         .version("0.1.0")
         .arg(
@@ -86,8 +92,7 @@ fn main() {
                 .help("Select preset [1-3]"),
         )
         .get_matches();
-
-    start_raytracer(matches);
+    return matches;
 }
 
 fn start_raytracer(matches: ArgMatches) {
