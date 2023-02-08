@@ -145,11 +145,20 @@ impl Raytracer {
         return (nearest_dist < 1000.0, point, normal, material);
     }
 
+    fn map_range(&mut self, from_range: (f32, f32), to_range: (f32, f32), s: f32) -> f32 {
+        to_range.0 + (s - from_range.0) * (to_range.1 - to_range.0) / (from_range.1 - from_range.0)
+    }
+
     fn cast_ray(&mut self, origin: vec3, direction: vec3, depth: u32) -> vec3 {
         let (hit, point, normal, material) = self.scene_intersect(origin, direction);
-        if depth > self.max_depth || !hit {
-            let bc = direction.y / 2.0 + 0.3;
-            return vec3 {x:bc, y:bc, z:bc};
+        if depth == self.max_depth || !hit {
+            let mut bc = self.map_range((-1.0, 1.0), (0.0, 0.8), direction.y);
+            bc = ((100.0 * bc) as u32) as f32 / 100.0;
+            return vec3 {
+                x: bc,
+                y: bc,
+                z: bc,
+            };
         }
 
         let direction_of_reflection = self.reflect(direction, normal).normalize();
