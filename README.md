@@ -19,3 +19,7 @@ cargo build --bin main
 ```bash
 target/debug/main --help
 ```
+
+## Documentation
+
+see [here](./documentation.md)
