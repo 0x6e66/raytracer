@@ -90,6 +90,14 @@ impl vec3 {
         return f32::sqrt(self.x * self.x + self.y * self.y + self.z * self.z);
     }
 
+    pub fn cross(self, vec: vec3) -> vec3 {
+        return vec3 {
+            x: self.y * vec.z - self.z * vec.y,
+            y: self.z * vec.x - self.x * vec.z,
+            z: self.x * vec.y - self.y * vec.x,
+        };
+    }
+
     pub fn normalize(&mut self) -> vec3 {
         let tmp: f32 = self.norm();
         return vec3 {
@@ -97,6 +105,38 @@ impl vec3 {
             y: self.y / tmp,
             z: self.z / tmp,
         };
+    }
+
+    pub fn look_at(&mut self, to: vec3) -> vec3 {
+        let forward = (*self - to).normalize();
+        let right = vec3 {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+        }
+        .cross(forward);
+        let up = forward.cross(right);
+
+        let current_pos = ndarray::arr1(&[self.x, self.y, self.z, 0.0]);
+
+        let transformation_matrix = ndarray::arr2(&[
+            [right.x, right.y, right.z, 0.0],
+            [up.x, up.y, up.z, 0.0],
+            [forward.x, forward.y, forward.z, 0.0],
+            [self.x, self.y, self.z, 1.0],
+        ]);
+
+        println!("{:?}\n{:?}\n", transformation_matrix, current_pos);
+
+        let new_cords = transformation_matrix.dot(&current_pos);
+
+        println!("{:?}\n", new_cords);
+        let res = vec3 {
+            x: new_cords[0] / new_cords[3],
+            y: new_cords[1] / new_cords[3],
+            z: new_cords[2] / new_cords[3],
+        };
+        return res;
     }
 
     pub fn rot_x(&mut self, theta: f32) -> vec3 {

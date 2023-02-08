@@ -6,11 +6,19 @@ mod setup;
 mod utils;
 
 use clap::{App, Arg, ArgMatches};
+use utils::vec3;
 
 fn main() {
-    let matches = get_matches();
+    // let matches = get_matches();
 
-    start_raytracer(matches);
+    // start_raytracer(matches);
+    let mut origin = utils::vec3 {
+        x: 5.0,
+        y: 5.0,
+        z: 5.0,
+    };
+    let new_orientation = origin.look_at(vec3 {x:1.0,y:1.0,z:1.0});
+    println!("{:?}", new_orientation);
 }
 
 fn get_matches() -> ArgMatches<'static> {
@@ -129,7 +137,7 @@ fn start_raytracer(matches: ArgMatches) {
         (10.0, 40.0),
         (53, 108, 160),
         (230, 102, 30),
-        (0.0, 6.0, 0.0),
+        (0.0, 10.0, 0.0),
         -4.0,
         max_depth,
         occlusion_offset,
@@ -163,7 +171,7 @@ fn is_valid_preset(s: String) -> Result<(), String> {
     let parsed = s.parse::<u32>();
     match parsed {
         Err(_) => return Err(String::from("The value is not an unsigned integer")),
-        Ok(_) => ()
+        Ok(_) => (),
     };
 
     let value = parsed.unwrap();

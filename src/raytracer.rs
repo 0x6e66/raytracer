@@ -237,9 +237,6 @@ impl Raytracer {
     pub fn start(&mut self, versionize: bool) {
         let mut img = image::RgbImage::new(self.width, self.height);
 
-        let x_rot = - 0.2;
-        let y_rot = 0.0;
-        let z_rot = 0.0;
         let dir_z = - (self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
         for h in tqdm::tqdm(0..self.height) {
             for w in 0..self.width {
@@ -260,10 +257,7 @@ impl Raytracer {
                             x: dir_x,
                             y: dir_y,
                             z: dir_z,
-                        }
-                        .rot_x(x_rot)
-                        .rot_y(y_rot)
-                        .rot_z(z_rot)
+                        }.look_at(vec3 {x:0.0, y:self.floor_level, z:-20.0})
                         .normalize(),
                         0,
                     );
