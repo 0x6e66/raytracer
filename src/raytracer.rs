@@ -250,7 +250,6 @@ impl Raytracer {
             y: 0.0,
             z: 0.0,
         };
-        // let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
         for i in 0..self.anti_aliasing_offsets.len() {
             let dir_x =
                 w as f32 - (self.width as f32 / 2.0).floor() + self.anti_aliasing_offsets[i].0;
@@ -275,10 +274,10 @@ impl Raytracer {
                 color += self.cast_ray(
                     self.camera_pos,
                     vec3 {
-                            x: dir_x,
-                            y: dir_y,
-                            z: dir_z,
-                        }
+                        x: dir_x,
+                        y: dir_y,
+                        z: dir_z,
+                    }
                     .normalize(),
                     0,
                 );

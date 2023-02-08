@@ -9,13 +9,7 @@ use clap::{value_parser, Arg, ArgMatches, Command};
 
 fn main() {
     let matches: ArgMatches = get_matches();
-
-    // let b = matches.get_many::<i32>("camera_pos").unwrap();
-    // println!("{:?}", b);
-
     start_raytracer(matches);
-
-    // println!("{} {}", s.as_bytes()[0], s.as_bytes()[len-1]);
 }
 
 fn get_matches() -> ArgMatches {
@@ -81,26 +75,23 @@ fn get_matches() -> ArgMatches {
         )
         .arg(Arg::new("look_at")
                 .long("look-at")
-                .requires("camera_pos")
-                .requires("look_at_pos")
                 .action(clap::ArgAction::SetTrue)
                 .help("Select weather or not you want to enable the look-at transformation to the camera (requires option 'camera_pos' and 'look_at_pos')"),
         )
         .arg(Arg::new("camera_pos")
                 .long("camera-pos")
-                .number_of_values(3)
                 .default_value("0,0,0")
                 .value_delimiter(',')
                 .value_parser(value_parser!(i32))
-                .allow_negative_numbers(true)
+                .allow_negative_numbers(false)
                 .help("Set position of camera")
         )
         .arg(Arg::new("look_at_pos")
                 .long("look-at-pos")
-                .number_of_values(3)
                 .default_value("0,-4,-20")
                 .value_delimiter(',')
                 .value_parser(value_parser!(i32))
+                .allow_negative_numbers(true)
                 .help("Set position of point to look at")
         )
         .get_matches();
@@ -135,7 +126,7 @@ fn start_raytracer(matches: ArgMatches) {
         .unwrap()
         .map(Iterator::collect)
         .collect();
-    let look_at_pos: (f32, f32, f32) = (
+    let look_at_point: (f32, f32, f32) = (
         *look_at_pos_tmp[0][0] as f32,
         *look_at_pos_tmp[0][1] as f32,
         *look_at_pos_tmp[0][2] as f32,
@@ -152,8 +143,8 @@ fn start_raytracer(matches: ArgMatches) {
         (10.0, 40.0),
         (53, 108, 160),
         (230, 102, 30),
-        camera_pos, //(-10.0, 10.0, -30.0),
-        look_at_pos, //(0.0, -4.0, -20.0),
+        camera_pos,
+        look_at_point,
         look_at,
         -4.0,
         max_depth,
@@ -166,12 +157,4 @@ fn start_raytracer(matches: ArgMatches) {
     );
 
     tracer.start(versionize);
-}
-
-fn is_i32(s: String) -> bool {
-    let parsed = s.parse::<i32>();
-    return match parsed {
-        Ok(_) => true,
-        Err(_) => false,
-    };
 }

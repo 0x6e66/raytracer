@@ -117,9 +117,9 @@ impl vec3 {
         .cross(forward);
         let up = forward.cross(right);
 
-        let translation_x = - from * right;
-        let translation_y = - from * up;
-        let translation_z = - from * forward;
+        let translation_x = -from * right;
+        let translation_y = -from * up;
+        let translation_z = -from * forward;
 
         let transformation_matrix = ndarray::arr2(&[
             [right.x, up.x, forward.x, 0.0],
@@ -127,16 +127,15 @@ impl vec3 {
             [right.z, up.z, forward.z, 0.0],
             [translation_x, translation_y, translation_z, 1.0],
         ]);
-            
+
         let vec_ = ndarray::arr1(&[vec.x, vec.y, vec.z, 0.0]);
         let new_vec = transformation_matrix.dot(&vec_);
 
-        let res = vec3 {
-            x: new_vec[0] / new_vec[3],
-            y: new_vec[1] / new_vec[3],
-            z: new_vec[2] / new_vec[3],
+        return vec3 {
+            x: new_vec[0],
+            y: new_vec[1],
+            z: new_vec[2],
         };
-        return res;
     }
 
     #[allow(dead_code)]
