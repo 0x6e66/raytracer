@@ -8,6 +8,8 @@ pub struct Raytracer {
     background_color: vec3,
     floor_dimensions: (f32, f32),
     camera_pos: vec3,
+    look_at_point: vec3,
+    look_at: bool,
     floor_color: vec3,
     floor_level: f32,
     max_depth: u32,
@@ -26,6 +28,8 @@ impl Raytracer {
         background_color: (u32, u32, u32),
         floor_color: (u32, u32, u32),
         camera_pos: (f32, f32, f32),
+        look_at_point: (f32, f32, f32),
+        look_at: bool,
         floor_level: f32,
         max_depth: u32,
         offset_for_mitigating_occlusion: f32,
@@ -63,6 +67,12 @@ impl Raytracer {
                 y: camera_pos.1,
                 z: camera_pos.2,
             },
+            look_at_point: vec3 {
+                x: look_at_point.0,
+                y: look_at_point.1,
+                z: look_at_point.2,
+            },
+            look_at: look_at,
             floor_level: floor_level,
             max_depth: max_depth,
             offset_for_mitigating_occlusion: offset_for_mitigating_occlusion,
@@ -234,45 +244,62 @@ impl Raytracer {
         }
     }
 
-    pub fn start(&mut self, versionize: bool) {
-        let mut img = image::RgbImage::new(self.width, self.height);
-
-        let dir_z = - (self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
-        for h in tqdm::tqdm(0..self.height) {
-            for w in 0..self.width {
-                let mut color = vec3 {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 0.0,
-                };
-                for i in 0..self.anti_aliasing_offsets.len() {
-                    let dir_x = w as f32 - (self.width as f32 / 2.0).floor()
-                        + self.anti_aliasing_offsets[i].0;
-                    let dir_y = (self.height as f32 / 2.0).floor()
-                        - h as f32
-                        - self.anti_aliasing_offsets[i].1;
-                    color += self.cast_ray(
+    pub fn calc_color_at_pixel(&mut self, w: u32, h: u32, dir_z: f32) -> [u8; 3] {
+        let mut color = vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
+        // let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
+        for i in 0..self.anti_aliasing_offsets.len() {
+            let dir_x =
+                w as f32 - (self.width as f32 / 2.0).floor() + self.anti_aliasing_offsets[i].0;
+            let dir_y =
+                (self.height as f32 / 2.0).floor() - h as f32 - self.anti_aliasing_offsets[i].1;
+            if self.look_at {
+                color += self.cast_ray(
+                    self.camera_pos,
+                    vec3::look_at(
                         self.camera_pos,
+                        self.look_at_point,
                         vec3 {
                             x: dir_x,
                             y: dir_y,
                             z: dir_z,
-                        }.look_at(vec3 {x:0.0, y:self.floor_level, z:-20.0})
-                        .normalize(),
-                        0,
-                    );
-                }
-                color = (color / self.anti_aliasing_offsets.len() as f32) * 255.0;
-
-                img.put_pixel(
-                    w,
-                    h,
-                    image::Rgb([
-                        color.x.floor() as u8,
-                        color.y.floor() as u8,
-                        color.z.floor() as u8,
-                    ]),
+                        },
+                    )
+                    .normalize(),
+                    0,
                 );
+            } else {
+                color += self.cast_ray(
+                    self.camera_pos,
+                    vec3 {
+                            x: dir_x,
+                            y: dir_y,
+                            z: dir_z,
+                        }
+                    .normalize(),
+                    0,
+                );
+            }
+        }
+        color = (color / self.anti_aliasing_offsets.len() as f32) * 255.0;
+        return [
+            color.x.floor() as u8,
+            color.y.floor() as u8,
+            color.z.floor() as u8,
+        ];
+    }
+
+    pub fn start(&mut self, versionize: bool) {
+        let mut img = image::RgbImage::new(self.width, self.height);
+
+        let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
+        for h in tqdm::tqdm(0..self.height) {
+            for w in 0..self.width {
+                let color = self.calc_color_at_pixel(w, h, dir_z);
+                img.put_pixel(w, h, image::Rgb(color));
             }
         }
         self.save_image(img, versionize);

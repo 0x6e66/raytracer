@@ -107,8 +107,8 @@ impl vec3 {
         };
     }
 
-    pub fn look_at(&mut self, to: vec3) -> vec3 {
-        let forward = (*self - to).normalize();
+    pub fn look_at(from: vec3, to: vec3, vec: vec3) -> vec3 {
+        let forward = (from - to).normalize();
         let right = vec3 {
             x: 0.0,
             y: 1.0,
@@ -117,28 +117,29 @@ impl vec3 {
         .cross(forward);
         let up = forward.cross(right);
 
-        let current_pos = ndarray::arr1(&[self.x, self.y, self.z, 0.0]);
+        let translation_x = - from * right;
+        let translation_y = - from * up;
+        let translation_z = - from * forward;
 
         let transformation_matrix = ndarray::arr2(&[
-            [right.x, right.y, right.z, 0.0],
-            [up.x, up.y, up.z, 0.0],
-            [forward.x, forward.y, forward.z, 0.0],
-            [self.x, self.y, self.z, 1.0],
+            [right.x, up.x, forward.x, 0.0],
+            [right.y, up.y, forward.y, 0.0],
+            [right.z, up.z, forward.z, 0.0],
+            [translation_x, translation_y, translation_z, 1.0],
         ]);
+            
+        let vec_ = ndarray::arr1(&[vec.x, vec.y, vec.z, 0.0]);
+        let new_vec = transformation_matrix.dot(&vec_);
 
-        println!("{:?}\n{:?}\n", transformation_matrix, current_pos);
-
-        let new_cords = transformation_matrix.dot(&current_pos);
-
-        println!("{:?}\n", new_cords);
         let res = vec3 {
-            x: new_cords[0] / new_cords[3],
-            y: new_cords[1] / new_cords[3],
-            z: new_cords[2] / new_cords[3],
+            x: new_vec[0] / new_vec[3],
+            y: new_vec[1] / new_vec[3],
+            z: new_vec[2] / new_vec[3],
         };
         return res;
     }
 
+    #[allow(dead_code)]
     pub fn rot_x(&mut self, theta: f32) -> vec3 {
         return vec3 {
             x: self.x,
@@ -147,6 +148,7 @@ impl vec3 {
         };
     }
 
+    #[allow(dead_code)]
     pub fn rot_y(&mut self, theta: f32) -> vec3 {
         return vec3 {
             x: self.x * f32::cos(theta) + self.z * f32::sin(theta),
@@ -155,6 +157,7 @@ impl vec3 {
         };
     }
 
+    #[allow(dead_code)]
     pub fn rot_z(&mut self, theta: f32) -> vec3 {
         return vec3 {
             x: self.x * f32::cos(theta) - self.y * f32::sin(theta),
