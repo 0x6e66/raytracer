@@ -98,6 +98,30 @@ impl vec3 {
             z: self.z / tmp,
         };
     }
+
+    pub fn rot_x(&mut self, theta: f32) -> vec3 {
+        return vec3 {
+            x: self.x,
+            y: self.y * f32::cos(theta) - self.z * f32::sin(theta),
+            z: self.y * f32::sin(theta) + self.z * f32::cos(theta),
+        };
+    }
+
+    pub fn rot_y(&mut self, theta: f32) -> vec3 {
+        return vec3 {
+            x: self.x * f32::cos(theta) + self.z * f32::sin(theta),
+            y: self.y,
+            z: -self.x * f32::sin(theta) + self.z * f32::cos(theta),
+        };
+    }
+
+    pub fn rot_z(&mut self, theta: f32) -> vec3 {
+        return vec3 {
+            x: self.x * f32::cos(theta) - self.y * f32::sin(theta),
+            y: self.x * f32::sin(theta) + self.y * f32::cos(theta),
+            z: self.z,
+        };
+    }
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -142,9 +166,17 @@ impl Material {
             specular_multiplier: 0.0,
             reflection_multiplier: 0.0,
             refraction_multiplier: 0.0,
-            diffuse_color: vec3 { x: 0.0, y: 0.0, z: 0.0 },
-            specular_color: vec3 { x: 1.0, y: 1.0, z: 1.0 },
-            specular_exponent: 0.0
+            diffuse_color: vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            specular_color: vec3 {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0,
+            },
+            specular_exponent: 0.0,
         }
     }
 }
@@ -170,7 +202,7 @@ impl Sphere {
 
 pub struct Light {
     pub pos: vec3,
-    pub intensity: f32
+    pub intensity: f32,
 }
 
 impl Light {

@@ -129,6 +129,7 @@ fn start_raytracer(matches: ArgMatches) {
         (10.0, 40.0),
         (53, 108, 160),
         (230, 102, 30),
+        (0.0, 6.0, 0.0),
         -4.0,
         max_depth,
         occlusion_offset,

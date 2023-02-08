@@ -7,6 +7,7 @@ pub struct Raytracer {
     height: u32,
     background_color: vec3,
     floor_dimensions: (f32, f32),
+    camera_pos: vec3,
     floor_color: vec3,
     floor_level: f32,
     max_depth: u32,
@@ -24,6 +25,7 @@ impl Raytracer {
         floor_dimensions: (f32, f32),
         background_color: (u32, u32, u32),
         floor_color: (u32, u32, u32),
+        camera_pos: (f32, f32, f32),
         floor_level: f32,
         max_depth: u32,
         offset_for_mitigating_occlusion: f32,
@@ -56,6 +58,11 @@ impl Raytracer {
                 y: floor_color.1 as f32,
                 z: floor_color.2 as f32,
             } / 255.0,
+            camera_pos: vec3 {
+                x: camera_pos.0,
+                y: camera_pos.1,
+                z: camera_pos.2,
+            },
             floor_level: floor_level,
             max_depth: max_depth,
             offset_for_mitigating_occlusion: offset_for_mitigating_occlusion,
@@ -230,7 +237,10 @@ impl Raytracer {
     pub fn start(&mut self, versionize: bool) {
         let mut img = image::RgbImage::new(self.width, self.height);
 
-        let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.2));
+        let x_rot = - 0.2;
+        let y_rot = 0.0;
+        let z_rot = 0.0;
+        let dir_z = - (self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
         for h in tqdm::tqdm(0..self.height) {
             for w in 0..self.width {
                 let mut color = vec3 {
@@ -245,16 +255,15 @@ impl Raytracer {
                         - h as f32
                         - self.anti_aliasing_offsets[i].1;
                     color += self.cast_ray(
-                        vec3 {
-                            x: 0.0,
-                            y: 0.0,
-                            z: 0.0,
-                        },
+                        self.camera_pos,
                         vec3 {
                             x: dir_x,
                             y: dir_y,
                             z: dir_z,
                         }
+                        .rot_x(x_rot)
+                        .rot_y(y_rot)
+                        .rot_z(z_rot)
                         .normalize(),
                         0,
                     );
