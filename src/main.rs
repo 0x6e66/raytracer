@@ -83,7 +83,7 @@ fn get_matches() -> ArgMatches {
                 .default_value("0,0,0")
                 .value_delimiter(',')
                 .value_parser(value_parser!(i32))
-                .allow_negative_numbers(false)
+                .allow_hyphen_values(true)
                 .help("Set position of camera")
         )
         .arg(Arg::new("look_at_pos")
@@ -91,7 +91,7 @@ fn get_matches() -> ArgMatches {
                 .default_value("0,-4,-20")
                 .value_delimiter(',')
                 .value_parser(value_parser!(i32))
-                .allow_negative_numbers(true)
+                .allow_hyphen_values(true)
                 .help("Set position of point to look at")
         )
         .get_matches();
