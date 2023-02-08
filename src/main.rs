@@ -5,118 +5,141 @@ mod raytracer;
 mod setup;
 mod utils;
 
-use clap::{App, Arg, ArgMatches};
+use clap::{value_parser, Arg, ArgMatches, Command};
 
 fn main() {
-    let matches = get_matches();
+    let matches: ArgMatches = get_matches();
+
+    // let b = matches.get_many::<i32>("camera_pos").unwrap();
+    // println!("{:?}", b);
 
     start_raytracer(matches);
+
+    // println!("{} {}", s.as_bytes()[0], s.as_bytes()[len-1]);
 }
 
-fn get_matches() -> ArgMatches<'static> {
-    let matches = App::new("Raytracer in rust")
+fn get_matches() -> ArgMatches {
+    let matches = Command::new("trace")
         .version("0.1.0")
-        .arg(
-            Arg::with_name("width")
-                .short("w")
+        .arg(Arg::new("width")
+                .short('w')
                 .long("width")
-                .takes_value(true)
                 .default_value("600")
-                .validator(is_u32)
-                .help("Width of the image"),
+                .value_parser(value_parser!(u32))
+                .help("Width of the image")
         )
-        .arg(
-            Arg::with_name("height")
-                .short("h")
+        .arg(Arg::new("height")
+                // .short('h')
                 .long("height")
-                .takes_value(true)
                 .default_value("400")
-                .validator(is_u32)
-                .help("Height of the image"),
+                .value_parser(value_parser!(u32))
+                .help("Height of the image")
         )
-        .arg(
-            Arg::with_name("output_path")
-                .short("o")
+        .arg(Arg::new("output_path")
+                .short('o')
                 .long("output")
-                .takes_value(true)
                 .default_value("out")
-                .help("Path where to store results (creates folder if not found)"),
+                .help("Path where to store results (creates folder if not found)")
         )
-        .arg(
-            Arg::with_name("versionize")
+        .arg(Arg::new("versionize")
                 .long("versionize")
-                .takes_value(false)
-                .help("If set output images are being saved with the datetime as prefix"),
+                .action(clap::ArgAction::SetTrue)
+                .help("If set output images are being saved with the datetime as prefix")
         )
-        .arg(
-            Arg::with_name("max_depth")
-                .short("d")
+        .arg(Arg::new("max_depth")
+                .short('d')
                 .long("max-depth")
-                .takes_value(true)
                 .default_value("4")
-                .validator(is_u32)
-                .help("Max. depth of reflected rays"),
+                .value_parser(value_parser!(u32))
+                .help("Max. depth of reflected rays")
         )
-        .arg(
-            Arg::with_name("anti_aliasing")
-                .short("a")
+        .arg(Arg::new("anti_aliasing")
+                .short('a')
                 .long("anti-aliasing")
-                .takes_value(true)
                 .default_value("2")
-                .validator(is_u32)
-                .help("Set scale of anti aliasing (number of rays per pixel = <argument> ^ 2)"),
+                .value_parser(value_parser!(u32))
+                .help("Set scale of anti aliasing (number of rays per pixel = <argument> ^ 2)")
         )
-        .arg(
-            Arg::with_name("occlusion_offset")
+        .arg(Arg::new("occlusion_offset")
                 .long("occlusion-offset")
-                .takes_value(true)
                 .default_value("0.1")
-                .validator(is_f32)
-                .help("Offset for mitigation occlusion"),
+                .value_parser(value_parser!(f32))
+                .help("Offset for mitigation occlusion")
         )
-        .arg(
-            Arg::with_name("fov")
+        .arg(Arg::new("fov")
                 .long("fov")
-                .takes_value(true)
                 .default_value("1.0")
-                .validator(is_f32)
-                .help("Field of view"),
+                .value_parser(value_parser!(f32))
+                .help("Field of view")
         )
-        .arg(
-            Arg::with_name("preset")
-                .short("p")
+        .arg(Arg::new("preset")
+                .short('p')
                 .long("preset")
-                .takes_value(true)
                 .default_value("1")
-                .validator(is_valid_preset)
-                .help("Select preset [1-3]"),
+                .value_parser(value_parser!(u32).range(1..4))
+                .help("Select preset [1-3]")
+        )
+        .arg(Arg::new("look_at")
+                .long("look-at")
+                .requires("camera_pos")
+                .requires("look_at_pos")
+                .action(clap::ArgAction::SetTrue)
+                .help("Select weather or not you want to enable the look-at transformation to the camera (requires option 'camera_pos' and 'look_at_pos')"),
+        )
+        .arg(Arg::new("camera_pos")
+                .long("camera-pos")
+                .number_of_values(3)
+                .default_value("0,0,0")
+                .value_delimiter(',')
+                .value_parser(value_parser!(i32))
+                .allow_negative_numbers(true)
+                .help("Set position of camera")
+        )
+        .arg(Arg::new("look_at_pos")
+                .long("look-at-pos")
+                .number_of_values(3)
+                .default_value("0,-4,-20")
+                .value_delimiter(',')
+                .value_parser(value_parser!(i32))
+                .help("Set position of point to look at")
         )
         .get_matches();
     return matches;
 }
 
 fn start_raytracer(matches: ArgMatches) {
-    let width = matches.value_of("width").unwrap().parse::<u32>().unwrap();
-    let height = matches.value_of("height").unwrap().parse::<u32>().unwrap();
-    let output_path = matches.value_of("output_path").unwrap().to_string();
-    let versionize = matches.is_present("versionize");
-    let max_depth = matches
-        .value_of("max_depth")
+    let width = *matches.get_one::<u32>("width").unwrap();
+    let height = *matches.get_one::<u32>("height").unwrap();
+    let output_path = matches.get_one::<String>("output_path").unwrap();
+    let versionize = matches.get_flag("versionize");
+    let max_depth = *matches.get_one::<u32>("max_depth").unwrap();
+    let anti_aliasing = *matches.get_one::<u32>("anti_aliasing").unwrap();
+    let occlusion_offset = *matches.get_one::<f32>("occlusion_offset").unwrap();
+    let fov = *matches.get_one::<f32>("fov").unwrap();
+    let preset = *matches.get_one::<u32>("preset").unwrap();
+    let look_at = matches.get_flag("look_at");
+
+    let camera_pos_tmp: Vec<Vec<&i32>> = matches
+        .get_occurrences("camera_pos")
         .unwrap()
-        .parse::<u32>()
-        .unwrap();
-    let anti_aliasing = matches
-        .value_of("anti_aliasing")
+        .map(Iterator::collect)
+        .collect();
+    let camera_pos: (f32, f32, f32) = (
+        *camera_pos_tmp[0][0] as f32,
+        *camera_pos_tmp[0][1] as f32,
+        *camera_pos_tmp[0][2] as f32,
+    );
+
+    let look_at_pos_tmp: Vec<Vec<&i32>> = matches
+        .get_occurrences("look_at_pos")
         .unwrap()
-        .parse::<u32>()
-        .unwrap();
-    let occlusion_offset = matches
-        .value_of("occlusion_offset")
-        .unwrap()
-        .parse::<f32>()
-        .unwrap();
-    let fov = matches.value_of("fov").unwrap().parse::<f32>().unwrap();
-    let preset = matches.value_of("preset").unwrap().parse::<u32>().unwrap();
+        .map(Iterator::collect)
+        .collect();
+    let look_at_pos: (f32, f32, f32) = (
+        *look_at_pos_tmp[0][0] as f32,
+        *look_at_pos_tmp[0][1] as f32,
+        *look_at_pos_tmp[0][2] as f32,
+    );
 
     let (spheres, lights) = match preset {
         1 => setup::get_spheres_lights_1(),
@@ -129,15 +152,15 @@ fn start_raytracer(matches: ArgMatches) {
         (10.0, 40.0),
         (53, 108, 160),
         (230, 102, 30),
-        (-10.0, 10.0, -30.0),
-        (0.0, -4.0, -20.0),
-        true,
+        camera_pos, //(-10.0, 10.0, -30.0),
+        look_at_pos, //(0.0, -4.0, -20.0),
+        look_at,
         -4.0,
         max_depth,
         occlusion_offset,
         anti_aliasing,
         fov,
-        output_path,
+        output_path.clone(),
         spheres,
         lights,
     );
@@ -145,32 +168,10 @@ fn start_raytracer(matches: ArgMatches) {
     tracer.start(versionize);
 }
 
-fn is_u32(s: String) -> Result<(), String> {
-    let parsed = s.parse::<u32>();
+fn is_i32(s: String) -> bool {
+    let parsed = s.parse::<i32>();
     return match parsed {
-        Err(_) => Err(String::from("The value is not an unsigned integer")),
-        Ok(_) => Ok(()),
+        Ok(_) => true,
+        Err(_) => false,
     };
-}
-
-fn is_f32(s: String) -> Result<(), String> {
-    let parsed = s.parse::<f32>();
-    return match parsed {
-        Err(_) => Err(String::from("The value is not a floating point number")),
-        Ok(_) => Ok(()),
-    };
-}
-
-fn is_valid_preset(s: String) -> Result<(), String> {
-    let parsed = s.parse::<u32>();
-    match parsed {
-        Err(_) => return Err(String::from("The value is not an unsigned integer")),
-        Ok(_) => (),
-    };
-
-    let value = parsed.unwrap();
-    if 1 <= value && value <= 3 {
-        return Ok(());
-    }
-    return Err(String::from("The value is not a valid preset number"));
 }
