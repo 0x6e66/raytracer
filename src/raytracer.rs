@@ -5,6 +5,7 @@ use image::RgbImage;
 pub struct Raytracer {
     width: u32,
     height: u32,
+    background_color: vec3,
     floor_dimensions: (f32, f32),
     floor_color: vec3,
     floor_level: f32,
@@ -21,6 +22,7 @@ impl Raytracer {
     pub fn new(
         resolution: (u32, u32),
         floor_dimensions: (f32, f32),
+        background_color: (u32, u32, u32),
         floor_color: (u32, u32, u32),
         floor_level: f32,
         max_depth: u32,
@@ -44,6 +46,11 @@ impl Raytracer {
             width: resolution.0,
             height: resolution.1,
             floor_dimensions: floor_dimensions,
+            background_color: vec3 {
+                x: background_color.0 as f32,
+                y: background_color.1 as f32,
+                z: background_color.2 as f32,
+            } / 255.0,
             floor_color: vec3 {
                 x: floor_color.0 as f32,
                 y: floor_color.1 as f32,
@@ -155,9 +162,9 @@ impl Raytracer {
             let mut bc = self.map_range((-1.0, 1.0), (0.0, 0.8), direction.y);
             bc = ((100.0 * bc) as u32) as f32 / 100.0;
             return vec3 {
-                x: bc,
-                y: bc,
-                z: bc,
+                x: bc * self.background_color.x,
+                y: bc * self.background_color.y,
+                z: bc * self.background_color.z,
             };
         }
 
