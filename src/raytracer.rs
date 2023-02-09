@@ -102,13 +102,13 @@ impl Raytracer {
         &mut self,
         origin: vec3,
         direction: vec3,
-        s: Sphere,
+        sphere: Sphere,
     ) -> (bool, f32) {
-        let l = s.center - origin;
-        let tca = l * direction;
-        let d2 = l * l - f32::powf(tca, 2.0);
-        if d2 < f32::powf(s.radius, 2.0) {
-            let thc = f32::sqrt(f32::powf(s.radius, 2.0) - d2);
+        let distance_to_center = sphere.center - origin;
+        let tca = distance_to_center * direction;
+        let d2 = distance_to_center * distance_to_center - f32::powf(tca, 2.0);
+        if d2 < f32::powf(sphere.radius, 2.0) {
+            let thc = f32::sqrt(f32::powf(sphere.radius, 2.0) - d2);
             let t0 = tca - thc;
             let t1 = tca + thc;
             if t0 > self.offset_for_mitigating_occlusion {
@@ -120,7 +120,7 @@ impl Raytracer {
         return (false, 0.0);
     }
 
-    fn scene_intersect(&mut self, origin: vec3, direction: vec3) -> (bool, vec3, vec3, Material) {
+    fn scene_interact(&mut self, origin: vec3, direction: vec3) -> (bool, vec3, vec3, Material) {
         let mut point = vec3 {
             x: 0.0,
             y: 0.0,
@@ -174,7 +174,7 @@ impl Raytracer {
     }
 
     fn cast_ray(&mut self, origin: vec3, direction: vec3, depth: u32) -> vec3 {
-        let (hit, point, normal, material) = self.scene_intersect(origin, direction);
+        let (hit, point, normal, material) = self.scene_interact(origin, direction);
         if depth == self.max_depth || !hit {
             let mut bc = self.map_range((-1.0, 1.0), (0.0, 0.8), direction.y);
             bc = ((100.0 * bc) as u32) as f32 / 100.0;
@@ -196,7 +196,7 @@ impl Raytracer {
         let mut specular_light_intensity = 0.0;
         for light in self.lights.clone() {
             let light_dir = (light.pos - point).normalize();
-            let (hit, shadow_pt, _, _) = self.scene_intersect(point, light_dir);
+            let (hit, shadow_pt, _, _) = self.scene_interact(point, light_dir);
 
             if !(hit && (shadow_pt - point).norm() < (light.pos - point).norm()) {
                 diffuse_light_intensity += f32::max(0.0, light_dir * normal) * light.intensity;
