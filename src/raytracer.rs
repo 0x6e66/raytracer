@@ -200,14 +200,13 @@ impl Raytracer {
 
             if !(hit && (shadow_pt - point).norm() < (light.pos - point).norm()) {
                 diffuse_light_intensity += f32::max(0.0, light_dir * normal) * light.intensity;
-                specular_light_intensity += f32::powf(
-                    f32::max(0.0, -self.reflect(-light_dir, normal) * direction),
-                    material.specular_exponent,
-                ) * light.intensity;
+                let tmp_base = f32::max(0.0, -self.reflect(-light_dir, normal) * direction);
+                specular_light_intensity += f32::powf(tmp_base, material.specular_exponent) * light.intensity;
             }
         }
         let diffuse_color = material.color * diffuse_light_intensity * material.diffuse_multiplier;
-        let specular_color = material.color * specular_light_intensity * material.specular_multiplier;
+        let specular_color =
+            material.color * specular_light_intensity * material.specular_multiplier;
         let reflection_color = color_of_reflection * material.reflection_multiplier;
         let refraction_color = color_of_refraction * material.refraction_multiplier;
 
