@@ -25,12 +25,14 @@ for h in 0..HEIGHT {
 save_image(img, ...);
 ```
 
+---
 ### (Fundamental) Camera (15 points)
 In this project the camera is represented by a base vector `camera_pos` (specified in the struct `Raytracer`) and a direction vector `direction`, which is calculated at runtime. In the function `calc_color_at_pixel` of the struct `Raytracer` the color is calculated by casting a ray from the position of the camera (`camera_pos`) in a certain direction (`direction`). Blow you can see a snippet, which shows how the ray is casted. Note, that the snippet is simplified for better understanding.
 ```rust
 color = cast_ray(camera_pos, direction.normalize(), ...);
 ```
 
+---
 ### (Fundamental) Objects: shape (15 points)
 The only objects in this project are spheres. Spheres are defined as follows:
 ```rust
@@ -59,6 +61,7 @@ return (false, 0.0);
 ```
 The calculation of the color is done in the function `cast_ray`. More on that later.
 
+---
 ### (Fundamental) Enhancing camera and rendering loop (10 points)
 The anti-aliasing is implemented in the function `calc_color_at_pixel` as follows:
 ```rust
@@ -84,9 +87,67 @@ This results in uniformly distributed points inside each pixel. Here are two exa
 <img src="img/anti_aliasing_2.png" width=45%>
 <img src="img/anti_aliasing_3.png" width=45%>
 
+---
 ### (Fundamental) Object material: diffuse (15 points)
+Material in this project are defined as follows:
+```rust
+pub struct Material {
+    pub refractive_index: f32,
+    pub diffuse_multiplier: f32,
+    pub specular_multiplier: f32,
+    pub reflection_multiplier: f32,
+    pub refraction_multiplier: f32,
+    pub color: vec3,
+    pub specular_exponent: f32,
+}
+```
+The diffuse color is calculated in the function `cast_ray` of the struct `Raytracer` as follows:
+```rust
+let diffuse_color = material.color * diffuse_light_intensity * material.diffuse_multiplier;
+```
+More on the calculation of `diffuse_light_intensity` [here](#optional-lights-30-points)
+
+---
 ### (Fundamental) Object material: specular (20 points)
+For definition of materials see [here](#fundamental-object-material-diffuse-15-points)
+The specular color is calculated in the function `cast_ray` of the struct `Raytracer` as follows:
+```rust
+let specular_color = material.color * specular_light_intensity * material.specular_multiplier;
+```
+More on the calculation of `specular_light_intensity` [here](#optional-lights-30-points)
+
+---
 ### (Optional) Object material: specular transmission (30 points)
+---
 ### (Optional) Lights (30 points)
+A Light consists of a position vector (`pos`) and an intensity value (`intensity`) and is defined as follows:
+```rust
+pub struct Light {
+    pub pos: vec3,
+    pub intensity: f32,
+}
+```
+
+The intensity of colors in regards to the light is calculated as follows:
+```rust
+let diffuse_light_intensity = 0;
+let specular_light_intensity = 0;
+for light in lights {
+    let light_dir = (light.pos - point).normalize();
+    let (hit, shadow_pt, _, _) = self.scene_interact(point, light_dir);
+
+    if !(hit && (shadow_pt - point).norm() < (light.pos - point).norm()) {
+        diffuse_light_intensity += max(0, light_dir * normal) * light.intensity;
+
+        let tmp_base = max(0, -self.reflect(-light_dir, normal) * direction);
+        specular_light_intensity += pow(tmp_base, material.specular_exponent) * light.intensity;
+    }
+}
+```
+Note, that the snippet is simplified for better understanding.
+
+---
 ### (Optional) Positioning and orienting camera (30 points)
+- look_at
+---
 ### (Optional) Animation (30 points)
