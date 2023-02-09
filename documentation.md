@@ -4,15 +4,20 @@
 
 - Name: Niklas Frondorf
 
+## General
+
+- There is no *Scene* or *Camera* Object
+- The Camera is represented by a base vector in the struct *Raytracer* called `camera_pos` and a `direction` which is calculated at runtime 
+  - Both of them are passed to the function `cast_ray`
+
 ## Sections
 
 ### (Fundamental) Rendering loop (5 points)
-
 ```rust
 let img = image::RgbImage::new(WIDTH, HEIGHT);
 for h in 0..HEIGHT {
     for w in 0..self.width {
-        color = self.cast_ray(...);
+        color = self.calc_color_at_pixel(w, h, ...);
         img.put_pixel(w, h, image::Rgb(color));
     }
 } 
