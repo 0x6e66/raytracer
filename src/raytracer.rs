@@ -152,7 +152,7 @@ impl Raytracer {
                     y: 1.0,
                     z: 0.0,
                 };
-                material.diffuse_color = self.floor_color;
+                material.color = self.floor_color;
             }
         }
 
@@ -206,10 +206,8 @@ impl Raytracer {
                 ) * light.intensity;
             }
         }
-        let diffuse_color =
-            material.diffuse_color * diffuse_light_intensity * material.diffuse_multiplier;
-        let specular_color =
-            material.specular_color * specular_light_intensity * material.specular_multiplier;
+        let diffuse_color = material.color * diffuse_light_intensity * material.diffuse_multiplier;
+        let specular_color = material.color * specular_light_intensity * material.specular_multiplier;
         let reflection_color = color_of_reflection * material.reflection_multiplier;
         let refraction_color = color_of_refraction * material.refraction_multiplier;
 

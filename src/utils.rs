@@ -173,8 +173,7 @@ pub struct Material {
     pub specular_multiplier: f32,
     pub reflection_multiplier: f32,
     pub refraction_multiplier: f32,
-    pub diffuse_color: vec3,
-    pub specular_color: vec3,
+    pub color: vec3,
     pub specular_exponent: f32,
 }
 
@@ -185,8 +184,7 @@ impl Material {
         specular_multiplier: f32,
         reflection_multiplier: f32,
         refraction_multiplier: f32,
-        diffuse_color: vec3,
-        specular_color: vec3,
+        color: vec3,
         specular_exponent: f32,
     ) -> Material {
         Material {
@@ -195,8 +193,7 @@ impl Material {
             specular_multiplier: specular_multiplier,
             reflection_multiplier: reflection_multiplier,
             refraction_multiplier: refraction_multiplier,
-            diffuse_color: diffuse_color,
-            specular_color: specular_color,
+            color: color,
             specular_exponent: specular_exponent,
         }
     }
@@ -208,15 +205,10 @@ impl Material {
             specular_multiplier: 0.0,
             reflection_multiplier: 0.0,
             refraction_multiplier: 0.0,
-            diffuse_color: vec3 {
+            color: vec3 {
                 x: 0.0,
                 y: 0.0,
                 z: 0.0,
-            },
-            specular_color: vec3 {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
             },
             specular_exponent: 0.0,
         }

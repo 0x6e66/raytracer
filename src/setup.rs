@@ -16,11 +16,6 @@ pub fn get_materials() -> HashMap<String, Material> {
                 y: 1.0,
                 z: 1.0,
             },
-            vec3 {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
-            },
             1425.0,
         ),
     );
@@ -36,11 +31,6 @@ pub fn get_materials() -> HashMap<String, Material> {
                 x: 0.6,
                 y: 0.7,
                 z: 0.8,
-            },
-            vec3 {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
             },
             125.0,
         ),
@@ -58,11 +48,6 @@ pub fn get_materials() -> HashMap<String, Material> {
                 y: 0.1,
                 z: 0.1,
             },
-            vec3 {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
-            },
             10.0,
         ),
     );
@@ -78,11 +63,6 @@ pub fn get_materials() -> HashMap<String, Material> {
                 x: 0.4,
                 y: 0.4,
                 z: 0.3,
-            },
-            vec3 {
-                x: 1.0,
-                y: 1.0,
-                z: 1.0,
             },
             50.0,
         ),
@@ -100,11 +80,6 @@ pub fn get_materials() -> HashMap<String, Material> {
                 y: 0.5,
                 z: 0.0,
             },
-            vec3 {
-                x: 0.5,
-                y: 0.5,
-                z: 0.5,
-            },
             50.0,
         ),
     );
@@ -119,11 +94,6 @@ pub fn get_materials() -> HashMap<String, Material> {
             vec3 {
                 x: 0.0,
                 y: 0.5,
-                z: 1.0,
-            },
-            vec3 {
-                x: 1.0,
-                y: 1.0,
                 z: 1.0,
             },
             50.0,
