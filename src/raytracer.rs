@@ -218,7 +218,7 @@ impl Raytracer {
 
         match img.save(path_buf.to_str().unwrap()) {
             Err(e) => println!("{:?}", e),
-            _ => (),
+            _ => println!("Saved image to '{}'", path_buf.to_str().unwrap())
         }
     }
 
@@ -252,6 +252,7 @@ impl Raytracer {
             frame.delay = 10;
             encoder.write_frame(&frame).unwrap();
         }
+        println!("Saved gif to '{}'", path_buf.to_str().unwrap());
     }
 
     pub fn calc_color_at_pixel(
@@ -312,15 +313,15 @@ impl Raytracer {
             y: to.1,
             z: to.2,
         };
-        let img = self.render_image_from_to(from_vec, to_vec, "");
+        let img = self.render_image_from_to(from_vec, to_vec,);
         self.save_image(img, path, versionize);
     }
 
-    fn render_image_from_to(&mut self, from: vec3, to: vec3, tqdm_desc: &str) -> image::RgbImage {
+    fn render_image_from_to(&mut self, from: vec3, to: vec3) -> image::RgbImage {
         let mut img = image::RgbImage::new(self.width, self.height);
 
         let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
-        for h in tqdm::tqdm(0..self.height).desc(Some(tqdm_desc)) {
+        for h in tqdm::tqdm(0..self.height) {
             for w in 0..self.width {
                 let color = self.calc_color_at_pixel(w, h, dir_z, from, to);
                 img.put_pixel(w, h, image::Rgb(color));
@@ -336,7 +337,6 @@ impl Raytracer {
         for h in tqdm::tqdm(0..self.height).desc(Some(tqdm_desc)) {
             for w in 0..self.width {
                 let color = self.calc_color_at_pixel(w, h, dir_z, from, to);
-                // img.put_pixel(w, h, image::Rgb(color));
                 pixels.push(color[0]);
                 pixels.push(color[1]);
                 pixels.push(color[2]);
@@ -364,6 +364,7 @@ impl Raytracer {
         };
 
         let mut frames: Vec<gif::Frame> = Vec::new();
+        let len_of_range = range.len().to_string().len();
 
         for (i, e) in range.clone().enumerate() {
             let x = f32::cos(e) * radius + look_at.x;
@@ -375,7 +376,7 @@ impl Raytracer {
                     z: z,
                 },
                 look_at,
-                format!("{:0>3}/{:0>3}", i+1, range.len()).as_str()
+                format!("Calculating image {:0>len$} of {:0>len$}", i+1, range.len(), len=len_of_range).as_str()
             );
             let frame = gif::Frame::from_rgb_speed(self.width as u16, self.height as u16, &img, 20);
             frames.push(frame);
