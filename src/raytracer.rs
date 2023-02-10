@@ -1,22 +1,18 @@
 use crate::utils::{vec3, Light, Material, Sphere};
 use chrono::{Datelike, Timelike};
-use image::RgbImage;
+use image::{RgbImage};
 
 pub struct Raytracer {
     width: u32,
     height: u32,
     background_color: vec3,
     floor_dimensions: (f32, f32),
-    camera_pos: vec3,
-    look_at_point: vec3,
-    look_at: bool,
     floor_color: vec3,
     floor_level: f32,
     max_depth: u32,
     offset_for_mitigating_occlusion: f32,
     anti_aliasing_offsets: Vec<(f32, f32)>,
     fov: f32,
-    path_output: String,
     spheres: Vec<Sphere>,
     lights: Vec<Light>,
 }
@@ -27,15 +23,11 @@ impl Raytracer {
         floor_dimensions: (f32, f32),
         background_color: (u32, u32, u32),
         floor_color: (u32, u32, u32),
-        camera_pos: (f32, f32, f32),
-        look_at_point: (f32, f32, f32),
-        look_at: bool,
         floor_level: f32,
         max_depth: u32,
         offset_for_mitigating_occlusion: f32,
         anti_aliasing: u32,
         fov: f32,
-        path_output: String,
         spheres: Vec<Sphere>,
         lights: Vec<Light>,
     ) -> Raytracer {
@@ -62,23 +54,11 @@ impl Raytracer {
                 y: floor_color.1 as f32,
                 z: floor_color.2 as f32,
             } / 255.0,
-            camera_pos: vec3 {
-                x: camera_pos.0,
-                y: camera_pos.1,
-                z: camera_pos.2,
-            },
-            look_at_point: vec3 {
-                x: look_at_point.0,
-                y: look_at_point.1,
-                z: look_at_point.2,
-            },
-            look_at: look_at,
             floor_level: floor_level,
             max_depth: max_depth,
             offset_for_mitigating_occlusion: offset_for_mitigating_occlusion,
             anti_aliasing_offsets: anti_aliasing_offsets,
             fov: fov,
-            path_output: path_output,
             spheres: spheres,
             lights: lights,
         };
@@ -201,7 +181,8 @@ impl Raytracer {
             if !(hit && (shadow_pt - point).norm() < (light.pos - point).norm()) {
                 diffuse_light_intensity += f32::max(0.0, light_dir * normal) * light.intensity;
                 let tmp_base = f32::max(0.0, -self.reflect(-light_dir, normal) * direction);
-                specular_light_intensity += f32::powf(tmp_base, material.specular_exponent) * light.intensity;
+                specular_light_intensity +=
+                    f32::powf(tmp_base, material.specular_exponent) * light.intensity;
             }
         }
         let diffuse_color = material.color * diffuse_light_intensity * material.diffuse_multiplier;
@@ -213,12 +194,12 @@ impl Raytracer {
         return diffuse_color + specular_color + reflection_color + refraction_color;
     }
 
-    fn save_image(&mut self, img: RgbImage, versionize: bool) {
+    fn save_image(&mut self, img: RgbImage, path: &str, versionize: bool) {
         let mut path_buf = std::path::PathBuf::new();
-        if !std::path::Path::new(self.path_output.as_str()).exists() {
-            std::fs::create_dir(self.path_output.as_str()).unwrap();
+        if !std::path::Path::new(path).exists() {
+            std::fs::create_dir_all(path).unwrap();
         }
-        path_buf.push(self.path_output.as_str());
+        path_buf.push(path);
         if versionize {
             let year = chrono::Local::now().year();
             let month = chrono::Local::now().month();
@@ -241,7 +222,14 @@ impl Raytracer {
         }
     }
 
-    pub fn calc_color_at_pixel(&mut self, w: u32, h: u32, dir_z: f32) -> [u8; 3] {
+    pub fn calc_color_at_pixel(
+        &mut self,
+        w: u32,
+        h: u32,
+        dir_z: f32,
+        from: vec3,
+        to: vec3,
+    ) -> [u8; 3] {
         let mut color = vec3 {
             x: 0.0,
             y: 0.0,
@@ -252,33 +240,20 @@ impl Raytracer {
                 w as f32 - (self.width as f32 / 2.0).floor() + self.anti_aliasing_offsets[i].0;
             let dir_y =
                 (self.height as f32 / 2.0).floor() - h as f32 - self.anti_aliasing_offsets[i].1;
-            if self.look_at {
-                color += self.cast_ray(
-                    self.camera_pos,
-                    vec3::look_at(
-                        self.camera_pos,
-                        self.look_at_point,
-                        vec3 {
-                            x: dir_x,
-                            y: dir_y,
-                            z: dir_z,
-                        },
-                    )
-                    .normalize(),
-                    0,
-                );
-            } else {
-                color += self.cast_ray(
-                    self.camera_pos,
+            color += self.cast_ray(
+                from,
+                vec3::look_at(
+                    from,
+                    to,
                     vec3 {
                         x: dir_x,
                         y: dir_y,
                         z: dir_z,
-                    }
-                    .normalize(),
-                    0,
-                );
-            }
+                    },
+                )
+                .normalize(),
+                0,
+            );
         }
         color = (color / self.anti_aliasing_offsets.len() as f32) * 255.0;
         return [
@@ -288,16 +263,85 @@ impl Raytracer {
         ];
     }
 
-    pub fn start(&mut self, versionize: bool) {
+    pub fn render_single_image(
+        &mut self,
+        from: (f32, f32, f32),
+        to: (f32, f32, f32),
+        path: &str,
+        versionize: bool,
+    ) {
+        let from_vec = vec3 {
+            x: from.0,
+            y: from.1,
+            z: from.2,
+        };
+        let to_vec = vec3 {
+            x: to.0,
+            y: to.1,
+            z: to.2,
+        };
+        let img = self.render_image_from_to(from_vec, to_vec, "");
+        self.save_image(img, path, versionize);
+    }
+
+    fn render_image_from_to(&mut self, from: vec3, to: vec3, tqdm_desc: &str) -> image::RgbImage {
         let mut img = image::RgbImage::new(self.width, self.height);
 
         let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
-        for h in tqdm::tqdm(0..self.height) {
+        for h in tqdm::tqdm(0..self.height).desc(Some(tqdm_desc)) {
             for w in 0..self.width {
-                let color = self.calc_color_at_pixel(w, h, dir_z);
+                let color = self.calc_color_at_pixel(w, h, dir_z, from, to);
                 img.put_pixel(w, h, image::Rgb(color));
             }
         }
-        self.save_image(img, versionize);
+        return img;
+    }
+
+    pub fn rotate_cam_around_point_and_render_images(
+        &mut self,
+        look_at_point: (f32,f32,f32),
+        y_level: i32,
+        radius: f32,
+        num_of_images: u32,
+        path: &str
+    ) {
+        let start = std::f32::consts::FRAC_PI_2;
+        let end = 2.0 * std::f32::consts::PI - 2.0 * std::f32::consts::PI / num_of_images as f32 + std::f32::consts::FRAC_PI_2;
+        let range = itertools_num::linspace(start, end, num_of_images as usize);
+        let look_at = vec3 {
+            x: look_at_point.0,
+            y: look_at_point.1,
+            z: look_at_point.2,
+        };
+
+        // let mut frames: Vec<gif::Frame> = Vec::new(); 
+
+        for (i, e) in range.clone().enumerate() {
+            let x = f32::cos(e) * radius + look_at.x;
+            let z = f32::sin(e) * radius + look_at.z;
+            let img = self.render_image_from_to(
+                vec3 {
+                    x: x,
+                    y: y_level as f32,
+                    z: z,
+                },
+                look_at,
+                format!("{:0>3}/{:0>3}", i+1, range.len()).as_str()
+            );
+            // let pixels = img.into_raw();
+            // let img_buffer: [u8; pixels.len()] = 
+            // let frame = gif::Frame::from_rgb(self.width as u16, self.height as u16, &img.clone().into_raw());
+            // frames.push(frame);
+            self.save_image(img, path, true);
+            // println!("{:?}", img.into_raw());
+        }
+
+        // let image = std::fs::File::create("out.gif").unwrap();
+        // let mut encoder = gif::Encoder::new(image, self.width as u16, self.height as u16, &[]).unwrap();
+        // encoder.set_repeat(gif::Repeat::Infinite).unwrap();
+
+        // for frame in frames {
+        //     encoder.write_frame(&frame).unwrap();
+        // }
     }
 }
