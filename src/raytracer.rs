@@ -222,6 +222,38 @@ impl Raytracer {
         }
     }
 
+    fn save_gif(&mut self, frames: Vec<gif::Frame>, path: &str, versionize: bool) {
+        let mut path_buf = std::path::PathBuf::new();
+        if !std::path::Path::new(path).exists() {
+            std::fs::create_dir_all(path).unwrap();
+        }
+        path_buf.push(path);
+        if versionize {
+            let year = chrono::Local::now().year();
+            let month = chrono::Local::now().month();
+            let day = chrono::Local::now().day();
+            let hour = chrono::Local::now().hour();
+            let minute = chrono::Local::now().minute();
+            let second = chrono::Local::now().second();
+            let img_name = format!(
+                "{}-{:0>2}-{:0>2}_{:0>2}{:0>2}{:0>2}_out.gif",
+                year, month, day, hour, minute, second
+            );
+            path_buf.push(img_name);
+        } else {
+            path_buf.push("out.gif");
+        }
+
+        let image = std::fs::File::create(path_buf.to_str().unwrap()).unwrap();
+        let mut encoder = gif::Encoder::new(image, self.width as u16, self.height as u16, &[]).unwrap();
+        encoder.set_repeat(gif::Repeat::Infinite).unwrap();
+
+        for mut frame in frames {
+            frame.delay = 10;
+            encoder.write_frame(&frame).unwrap();
+        }
+    }
+
     pub fn calc_color_at_pixel(
         &mut self,
         w: u32,
@@ -297,13 +329,30 @@ impl Raytracer {
         return img;
     }
 
+    fn render_image_from_to_raw(&mut self, from: vec3, to: vec3, tqdm_desc: &str) -> Vec<u8> {
+        let mut pixels: Vec<u8> = Vec::new();
+
+        let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
+        for h in tqdm::tqdm(0..self.height).desc(Some(tqdm_desc)) {
+            for w in 0..self.width {
+                let color = self.calc_color_at_pixel(w, h, dir_z, from, to);
+                // img.put_pixel(w, h, image::Rgb(color));
+                pixels.push(color[0]);
+                pixels.push(color[1]);
+                pixels.push(color[2]);
+            }
+        }
+        return pixels;
+    }
+
     pub fn rotate_cam_around_point_and_render_images(
         &mut self,
         look_at_point: (f32,f32,f32),
         y_level: i32,
         radius: f32,
         num_of_images: u32,
-        path: &str
+        path: &str,
+        versionize: bool
     ) {
         let start = std::f32::consts::FRAC_PI_2;
         let end = 2.0 * std::f32::consts::PI - 2.0 * std::f32::consts::PI / num_of_images as f32 + std::f32::consts::FRAC_PI_2;
@@ -314,12 +363,12 @@ impl Raytracer {
             z: look_at_point.2,
         };
 
-        // let mut frames: Vec<gif::Frame> = Vec::new(); 
+        let mut frames: Vec<gif::Frame> = Vec::new();
 
         for (i, e) in range.clone().enumerate() {
             let x = f32::cos(e) * radius + look_at.x;
             let z = f32::sin(e) * radius + look_at.z;
-            let img = self.render_image_from_to(
+            let img = self.render_image_from_to_raw(
                 vec3 {
                     x: x,
                     y: y_level as f32,
@@ -328,20 +377,10 @@ impl Raytracer {
                 look_at,
                 format!("{:0>3}/{:0>3}", i+1, range.len()).as_str()
             );
-            // let pixels = img.into_raw();
-            // let img_buffer: [u8; pixels.len()] = 
-            // let frame = gif::Frame::from_rgb(self.width as u16, self.height as u16, &img.clone().into_raw());
-            // frames.push(frame);
-            self.save_image(img, path, true);
-            // println!("{:?}", img.into_raw());
+            let frame = gif::Frame::from_rgb_speed(self.width as u16, self.height as u16, &img, 20);
+            frames.push(frame);
         }
 
-        // let image = std::fs::File::create("out.gif").unwrap();
-        // let mut encoder = gif::Encoder::new(image, self.width as u16, self.height as u16, &[]).unwrap();
-        // encoder.set_repeat(gif::Repeat::Infinite).unwrap();
-
-        // for frame in frames {
-        //     encoder.write_frame(&frame).unwrap();
-        // }
+        self.save_gif(frames, path, versionize);
     }
 }
