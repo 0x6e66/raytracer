@@ -89,17 +89,18 @@ fn cli() -> Command {
                 .value_delimiter(',')
                 .value_parser(value_parser!(i32))
                 .allow_hyphen_values(true)
-                .help("Set position of point to look at"),
+                .help("Set position of point to look at")
+        )
+        .arg(
+            Arg::new("versionize")
+                .long("versionize")
+                .action(clap::ArgAction::SetTrue)
+                .help("If set output images are being saved with the datetime as prefix")
+                .global(true)
         )
         .subcommand(
             Command::new("img")
                 .about("create a single image")
-                .arg(
-                    Arg::new("versionize")
-                        .long("versionize")
-                        .action(clap::ArgAction::SetTrue)
-                        .help("If set output images are being saved with the datetime as prefix"),
-                )
                 .arg(
                     Arg::new("camera_pos")
                         .long("camera-pos")
@@ -162,6 +163,7 @@ fn start_raytracer(matches: ArgMatches) {
         *look_at_pos_tmp[0][1] as f32,
         *look_at_pos_tmp[0][2] as f32,
     );
+    let versionize = matches.get_flag("versionize");
 
     let mut tracer = raytracer::Raytracer::new(
         (width, height),
@@ -179,7 +181,6 @@ fn start_raytracer(matches: ArgMatches) {
 
     match matches.subcommand() {
         Some(("img", sub_matches)) => {
-            let versionize = sub_matches.get_flag("versionize");
             let camera_pos_tmp: Vec<Vec<&i32>> = sub_matches
                 .get_occurrences("camera_pos")
                 .unwrap()
@@ -196,7 +197,7 @@ fn start_raytracer(matches: ArgMatches) {
             let y_level = *sub_matches.get_one::<i32>("y_level").unwrap();
             let radius = *sub_matches.get_one::<f32>("radius").unwrap();
             let num_of_images = *sub_matches.get_one::<u32>("num_of_images").unwrap();
-            tracer.rotate_cam_around_point_and_render_images(look_at_point, y_level, radius, num_of_images, output_path);
+            tracer.rotate_cam_around_point_and_render_images(look_at_point, y_level, radius, num_of_images, output_path, versionize);
         }
         _ => {}
     }
