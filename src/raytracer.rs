@@ -1,6 +1,6 @@
 use crate::utils::{vec3, Light, Material, Sphere};
 use chrono::{Datelike, Timelike};
-use image::{RgbImage};
+use image::RgbImage;
 
 pub struct Raytracer {
     width: u32,
@@ -84,13 +84,13 @@ impl Raytracer {
         direction: vec3,
         sphere: Sphere,
     ) -> (bool, f32) {
-        let distance_to_center = sphere.center - origin;
-        let tca = distance_to_center * direction;
-        let d2 = distance_to_center * distance_to_center - f32::powf(tca, 2.0);
-        if d2 < f32::powf(sphere.radius, 2.0) {
-            let thc = f32::sqrt(f32::powf(sphere.radius, 2.0) - d2);
-            let t0 = tca - thc;
-            let t1 = tca + thc;
+        let vec_to_center = sphere.center - origin;
+        let projection_of_dir_to_center = vec_to_center * direction;
+        let discriminant = vec_to_center * vec_to_center - f32::powf(projection_of_dir_to_center, 2.0);
+        if discriminant < f32::powf(sphere.radius, 2.0) {
+            let tmp = f32::sqrt(f32::powf(sphere.radius, 2.0) - discriminant);
+            let t0 = projection_of_dir_to_center - tmp;
+            let t1 = projection_of_dir_to_center + tmp;
             if t0 > self.offset_for_mitigating_occlusion {
                 return (true, t0);
             } else if t1 > self.offset_for_mitigating_occlusion {
@@ -98,6 +98,7 @@ impl Raytracer {
             }
         }
         return (false, 0.0);
+
     }
 
     fn scene_interact(&mut self, origin: vec3, direction: vec3) -> (bool, vec3, vec3, Material) {
@@ -218,7 +219,7 @@ impl Raytracer {
 
         match img.save(path_buf.to_str().unwrap()) {
             Err(e) => println!("{:?}", e),
-            _ => println!("Saved image to '{}'", path_buf.to_str().unwrap())
+            _ => println!("Saved image to '{}'", path_buf.to_str().unwrap()),
         }
     }
 
@@ -245,7 +246,8 @@ impl Raytracer {
         }
 
         let image = std::fs::File::create(path_buf.to_str().unwrap()).unwrap();
-        let mut encoder = gif::Encoder::new(image, self.width as u16, self.height as u16, &[]).unwrap();
+        let mut encoder =
+            gif::Encoder::new(image, self.width as u16, self.height as u16, &[]).unwrap();
         encoder.set_repeat(gif::Repeat::Infinite).unwrap();
 
         for mut frame in frames {
@@ -313,7 +315,7 @@ impl Raytracer {
             y: to.1,
             z: to.2,
         };
-        let img = self.render_image_from_to(from_vec, to_vec,);
+        let img = self.render_image_from_to(from_vec, to_vec);
         self.save_image(img, path, versionize);
     }
 
@@ -347,15 +349,16 @@ impl Raytracer {
 
     pub fn rotate_cam_around_point_and_render_images(
         &mut self,
-        look_at_point: (f32,f32,f32),
+        look_at_point: (f32, f32, f32),
         y_level: i32,
         radius: f32,
         num_of_images: u32,
         path: &str,
-        versionize: bool
+        versionize: bool,
     ) {
         let start = std::f32::consts::FRAC_PI_2;
-        let end = 2.0 * std::f32::consts::PI - 2.0 * std::f32::consts::PI / num_of_images as f32 + std::f32::consts::FRAC_PI_2;
+        let end = 2.0 * std::f32::consts::PI - 2.0 * std::f32::consts::PI / num_of_images as f32
+            + std::f32::consts::FRAC_PI_2;
         let range = itertools_num::linspace(start, end, num_of_images as usize);
         let look_at = vec3 {
             x: look_at_point.0,
@@ -376,7 +379,13 @@ impl Raytracer {
                     z: z,
                 },
                 look_at,
-                format!("Calculating image {:0>len$} of {:0>len$}", i+1, range.len(), len=len_of_range).as_str()
+                format!(
+                    "Calculating image {:0>len$} of {:0>len$}",
+                    i + 1,
+                    range.len(),
+                    len = len_of_range
+                )
+                .as_str(),
             );
             let frame = gif::Frame::from_rgb_speed(self.width as u16, self.height as u16, &img, 20);
             frames.push(frame);

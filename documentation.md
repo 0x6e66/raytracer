@@ -17,8 +17,8 @@ The main rendering loop(s) can be found in the function `start` of the struct `R
 ```rust
 let img = image::RgbImage::new(WIDTH, HEIGHT);
 for h in 0..HEIGHT {
-    for w in 0..self.width {
-        color = self.calc_color_at_pixel(w, h, ...);
+    for w in 0..HEIGHT {
+        color = calc_color_at_pixel(w, h, ...);
         img.put_pixel(w, h, image::Rgb(color));
     }
 } 
@@ -27,14 +27,14 @@ save_image(img, ...);
 
 ---
 ### (Fundamental) Camera (15 points)
-In this project the camera is represented by a base vector `camera_pos` (specified in the struct `Raytracer`) and a direction vector `direction`, which is calculated at runtime. In the function `calc_color_at_pixel` of the struct `Raytracer` the color is calculated by casting a ray from the position of the camera (`camera_pos`) in a certain direction (`direction`). Blow you can see a snippet, which shows how the ray is casted. Note, that the snippet is simplified for better understanding.
+In this project the camera is represented by a base vector `camera_pos` (specified in the struct `Raytracer`) and a direction vector `direction`, which is calculated at runtime. In the function `calc_color_at_pixel` of the struct `Raytracer` the color is calculated by casting a ray from the position of the camera (`camera_pos`) in a certain direction (`direction`). The function `cast_ray` returns the color for the pixel. Blow you can see a snippet, which shows how the ray is casted. Note, that the snippet is simplified for better understanding.
 ```rust
 color = cast_ray(camera_pos, direction.normalize(), ...);
 ```
 
 ---
 ### (Fundamental) Objects: shape (15 points)
-The only objects in this project are spheres. Spheres are defined as follows:
+The only real objects in this project are spheres. Spheres are defined as follows:
 ```rust
 pub struct Sphere {
     pub center: vec3,
@@ -44,13 +44,13 @@ pub struct Sphere {
 ```
 The intersection of rays and spheres is handled by the function `intersect_between_ray_and_sphere`. Blow you can see a snippet, which shows how the intersection is handled. Note, that the snippet is simplified for better understanding.
 ```rust
-let distance_to_center = sphere.center - origin;
-let tca = distance_to_center * direction;
-let d2 = distance_to_center * distance_to_center - pow(tca, 2);
-if d2 < pow(sphere.radius, 2) {
-    let thc = sqrt(pow(sphere.radius, 2) - d2);
-    let t0 = tca - thc;
-    let t1 = tca + thc;
+let vec_to_center = sphere.center - origin;
+let projection_of_dir_to_center = vec_to_center * direction;
+let discriminant = vec_to_center * vec_to_center - pow(projection_of_dir_to_center, 2.0);
+if discriminant < pow(sphere.radius, 2.0) {
+    let tmp = sqrt(pow(sphere.radius, 2.0) - discriminant);
+    let t0 = projection_of_dir_to_center - tmp;
+    let t1 = projection_of_dir_to_center + tmp;
     if t0 > offset_for_mitigating_occlusion {
         return (true, t0);
     } else if t1 > offset_for_mitigating_occlusion {
