@@ -248,6 +248,6 @@ Options:
           Print version
 ```
 #### Gif creation
-It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif subcommand` in the [CLI](#command-line-interface). You can specify a center point, where the camera is rotation around in a circle, a radius for the circle, the height of the circle (y-level), a number of images, that should be taken turing one full rotation on the circle and a point to look at. The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
+It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif` subcommand` in the [CLI](#command-line-interface). You can specify a center point, where the camera is rotation around in a circle, a radius for the circle, the height of the circle (y-level), a number of images, that should be taken turing one full rotation on the circle and a point to look at. The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
 
 ![](img/out.gif)
