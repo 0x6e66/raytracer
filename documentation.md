@@ -139,7 +139,7 @@ More on the calculation of `specular_light_intensity` [here](#optional-lights-30
 ---
 ### (Optional) Object material: specular transmission (30 points)
 
-The change of direction of light without a change in color is accomplished by setting the right values when creating a material. There is no different way of handling such internal refractions than regular refraction. An example for the material *glass* can be found in preset 4.
+The change of the direction of light without a change in color is accomplished by setting the right values when creating a material. There is no different way of handling such internal refractions than regular refraction in code. An example for the material *glass* can be found in preset 4.
 
 ---
 ### (Optional) Lights (30 points)
@@ -247,7 +247,14 @@ Options:
   -V, --version
           Print version
 ```
+
+Example usage:
+- Create an image in full hd resolution from (0,10,10), looking at (0,0,-20) with preset 1
+  - `cargo run --bin main -- --width=1920 --height=1080 --camera-pos=0,10,10 --look-at-pos=0,0,-20 --preset=1`
+
+
 #### Gif creation
-It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif` subcommand` in the [CLI](#command-line-interface). You can specify a center point, where the camera is rotation around in a circle, a radius for the circle, the height of the circle (y-level), a number of images, that should be taken turing one full rotation on the circle and a point to look at. The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
+It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif` subcommand` in the [CLI](#command-line-interface). You can specify a center point, where the camera is rotation around in a circle, a radius for the circle, the height of the circle (y-level), a number of images, that should be taken turing one full rotation on the circle and a point to look at.
+The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
 
 ![](img/out.gif)
