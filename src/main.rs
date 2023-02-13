@@ -113,7 +113,7 @@ fn cli() -> Command {
         )
         .subcommand(
             Command::new("gif")
-            .about("create multiple images, that can be combined into a gif")
+            .about("rotates the point around a point and creates a gif")
             .arg(
                 Arg::new("y_level")
                     .long("y-level")

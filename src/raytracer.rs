@@ -68,14 +68,14 @@ impl Raytracer {
         return vector - axis * (vector * axis) * 2.0;
     }
 
-    fn refract(&mut self, mut vector: vec3, mut axis: vec3, eta_t: f32, eta_i: f32) -> vec3 {
-        let cosi = -(vector * axis) / (vector.norm() * axis.norm());
-        if cosi > 0.0 {
-            let eta = eta_i / eta_t;
+    fn refract(&mut self, mut vector: vec3, mut axis: vec3, refractive_index: f32, eta_i: f32) -> vec3 {
+        let cosi = (vector * axis) / (vector.norm() * axis.norm());
+        if cosi < 0.0 {
+            let eta = eta_i / refractive_index;
             let tmp = 1.0 - f32::powf(eta, 2.0) + f32::powf(eta * cosi, 2.0);
-            return vector * eta + axis * eta * cosi - axis * f32::sqrt(tmp);
+            return vector * eta - axis * eta * cosi - axis * f32::sqrt(tmp);
         }
-        return self.refract(vector, -axis, eta_i, eta_t);
+        return self.refract(vector, -axis, eta_i, refractive_index);
     }
 
     fn intersect_between_ray_and_sphere(
@@ -315,11 +315,11 @@ impl Raytracer {
             y: to.1,
             z: to.2,
         };
-        let img = self.render_image_from_to(from_vec, to_vec);
+        let img = self.render_image_rgbimage(from_vec, to_vec);
         self.save_image(img, path, versionize);
     }
 
-    fn render_image_from_to(&mut self, from: vec3, to: vec3) -> image::RgbImage {
+    fn render_image_rgbimage(&mut self, from: vec3, to: vec3) -> image::RgbImage {
         let mut img = image::RgbImage::new(self.width, self.height);
 
         let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
@@ -332,7 +332,7 @@ impl Raytracer {
         return img;
     }
 
-    fn render_image_from_to_raw(&mut self, from: vec3, to: vec3, tqdm_desc: &str) -> Vec<u8> {
+    fn render_image_raw(&mut self, from: vec3, to: vec3, tqdm_desc: &str) -> Vec<u8> {
         let mut pixels: Vec<u8> = Vec::new();
 
         let dir_z = -(self.height as f32) / (2.0 * f32::tan(self.fov / 2.0));
@@ -372,7 +372,7 @@ impl Raytracer {
         for (i, e) in range.clone().enumerate() {
             let x = f32::cos(e) * radius + look_at.x;
             let z = f32::sin(e) * radius + look_at.z;
-            let img = self.render_image_from_to_raw(
+            let img = self.render_image_raw(
                 vec3 {
                     x: x,
                     y: y_level as f32,
