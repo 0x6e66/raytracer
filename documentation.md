@@ -107,9 +107,9 @@ for i in 1..anti_aliasing + 1 {
 }
 ```
 This results in uniformly distributed points inside each pixel. Here are two examples of offset distributions with 2 and 3 as input respectively.
-<center>
+
 <img src="img/anti_aliasing_2.png" width=45%> <img src="img/anti_aliasing_3.png" width=45%>
-</center>
+
 
 ---
 ### (Fundamental) Object material: diffuse (15 points)
