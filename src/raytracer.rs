@@ -257,7 +257,7 @@ impl Raytracer {
         println!("Saved gif to '{}'", path_buf.to_str().unwrap());
     }
 
-    pub fn calc_color_at_pixel(
+    fn calc_color_at_pixel(
         &mut self,
         w: u32,
         h: u32,

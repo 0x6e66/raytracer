@@ -78,8 +78,8 @@ fn cli() -> Command {
                 .short('p')
                 .long("preset")
                 .default_value("1")
-                .value_parser(value_parser!(u32).range(1..4))
-                .help("Select preset [1-3]")
+                .value_parser(value_parser!(u32).range(1..5))
+                .help("Select preset [1-4]")
                 .global(true),
         )
         .arg(
@@ -151,6 +151,7 @@ fn start_raytracer(matches: ArgMatches) {
         1 => setup::get_spheres_lights_1(),
         2 => setup::get_spheres_lights_2(),
         3 => setup::get_spheres_lights_3(),
+        4 => setup::get_spheres_lights_4(),
         _ => setup::get_spheres_lights_1(),
     };
     let look_at_pos_tmp: Vec<Vec<&i32>> = matches

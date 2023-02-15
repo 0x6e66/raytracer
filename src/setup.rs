@@ -296,3 +296,83 @@ pub fn get_spheres_lights_3() -> (Vec<Sphere>, Vec<Light>) {
 
     return (spheres, lights);
 }
+
+#[allow(dead_code)]
+pub fn get_spheres_lights_4() -> (Vec<Sphere>, Vec<Light>) {
+    let materials = get_materials();
+
+    let mut spheres: Vec<Sphere> = Vec::new();
+    spheres.push(Sphere::new(
+        vec3 {
+            x: -10.0,
+            y: 0.0,
+            z: -20.0,
+        },
+        4.0,
+        materials["mirror"],
+    ));
+    spheres.push(Sphere::new(
+        vec3 {
+            x: -3.0,
+            y: 0.0,
+            z: -20.0,
+        },
+        3.0,
+        materials["amber"],
+    ));
+    spheres.push(Sphere::new(
+        vec3 {
+            x: 4.0,
+            y: 0.0,
+            z: -20.0,
+        },
+        4.0,
+        materials["rubber"],
+    ));
+    spheres.push(Sphere::new(
+        vec3 {
+            x: -6.0,
+            y: 2.0,
+            z: -30.0,
+        },
+        6.0,
+        materials["sapphire"],
+    ));
+    spheres.push(Sphere::new(
+        vec3 {
+            x: 6.0,
+            y: 2.0,
+            z: -30.0,
+        },
+        6.0,
+        materials["glass"],
+    ));
+
+    let mut lights: Vec<Light> = Vec::new();
+    lights.push(Light::new(
+        vec3 {
+            x: 4.0,
+            y: 30.0,
+            z: -20.0,
+        },
+        1.0,
+    ));
+    // lights.push(Light::new(
+    //     vec3 {
+    //         x: -4.0,
+    //         y: 30.0,
+    //         z: -20.0,
+    //     },
+    //     1.0,
+    // ));
+    lights.push(Light::new(
+        vec3 {
+            x: 0.0,
+            y: 30.0,
+            z: -16.0,
+        },
+        1.0,
+    ));
+
+    return (spheres, lights);
+}
