@@ -81,6 +81,10 @@ return (false, 0.0);
 ```
 The calculation of the actual color is done in the function `cast_ray`. More on that later.
 
+Image of 5 spheres with command `cargo run --bin main -- --look-at-pos=0,-4,-30 img --width=600 --height=400 -p4 --camera-pos=0,10,0`:
+
+![](img/5-spheres.png)
+
 ---
 ### (Fundamental) Enhancing camera and rendering loop (10 points)
 The anti-aliasing is implemented in the function `calc_color_at_pixel` as follows:
@@ -205,7 +209,7 @@ pub fn look_at(from: vec3, to: vec3, vec: vec3) -> vec3 {
     };
 }
 ```
-The function is used for the `gif` subcommand in the cli. More on the `cli` [here](#gif-creation)
+The function is used for the `gif` subcommand in the cli. More on the cli [here](#gif-creation)
 
 ---
 ### Additional stuff
