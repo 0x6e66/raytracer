@@ -254,7 +254,7 @@ Options:
 
 Example usage:
 - Create an image in full hd resolution from (0,10,10), looking at (0,0,-20) with preset 1
-  - `cargo run --bin main -- --width=1920 --height=1080 --camera-pos=0,10,10 --look-at-pos=0,0,-20 --preset=1`
+  - `cargo run --bin main -- --look-at-pos=0,0,-20 img --width=1920 --height=1080 --camera-pos=0,10,10 --preset=1`
 
 
 #### Gif creation
