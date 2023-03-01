@@ -35,7 +35,7 @@ fn cli() -> Command {
             Arg::new("output_path")
                 .short('o')
                 .long("output")
-                .default_value("out")
+                .default_value("")
                 .help("Path where to store results (creates folder if not found)")
                 .global(true),
         )

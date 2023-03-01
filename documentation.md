@@ -15,9 +15,9 @@
     - [(Optional) Object material: specular transmission (30 points)](#optional-object-material-specular-transmission-30-points)
     - [(Optional) Lights (30 points)](#optional-lights-30-points)
     - [(Optional) Positioning and orienting camera (30 points)](#optional-positioning-and-orienting-camera-30-points)
+    - [(Optional) Animation](#optional-animation)
     - [Additional stuff](#additional-stuff)
       - [Command line interface](#command-line-interface)
-      - [Gif creation](#gif-creation)
 
 
 ## Author
@@ -143,7 +143,7 @@ More on the calculation of `specular_light_intensity` [here](#optional-lights-30
 ---
 ### (Optional) Object material: specular transmission (30 points)
 
-The change of the direction of light without a change in color is accomplished by setting the right values when creating a material. There is no different way of handling such internal refractions than regular refraction in code. An example for the material *glass* can be found in preset 4.
+The change of the direction of light without a change in color is accomplished by setting the right values when creating a material. There is no different way of handling such internal refractions than regular refraction in code. An example for the material *glass* can be found in preset 4 (the image in [this](#fundamental-objects-shape-15-points) section).
 
 ---
 ### (Optional) Lights (30 points)
@@ -175,7 +175,7 @@ Note, that the snippet is simplified for better understanding.
 
 ---
 ### (Optional) Positioning and orienting camera (30 points)
-An implementation of the look-at transform can be found in the implementation of the struct `vec3`. The function calculates the look-at transformation matrix and directly applies the transformation to a vector the ist also passed to the function. Blow you can see a snippet, which shows how the intersection is handled. Note, that the snippet is simplified for better understanding.
+An implementation of the look-at transform can be found in the implementation of the struct `vec3`. The function calculates the look-at transformation matrix (from the parameters `from` and `to`) and directly applies the transformation to a vector (`vec`) that is also passed to the function. Blow you can see a code snippet, which shows how the intersection is handled. Note, that the snippet is simplified for better understanding.
 
 ```rust
 pub fn look_at(from: vec3, to: vec3, vec: vec3) -> vec3 {
@@ -209,7 +209,14 @@ pub fn look_at(from: vec3, to: vec3, vec: vec3) -> vec3 {
     };
 }
 ```
-The function is used for the `gif` subcommand in the cli. More on the cli [here](#gif-creation)
+The function is used for the [gif subcommand](#optional-animation) in the cli. More on the cli [here](#gif-creation)
+
+### (Optional) Animation
+It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif` subcommand in the [CLI](#command-line-interface). You can specify a center point, where the camera is looking at and rotating around (`--look-at-pos`), a radius for the circle (`--radius`), the height of the circle (`--y-level`) and a number of images (`--num-of-images`), that should be taken turing one full rotation on the circle.
+The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
+
+![](img/out.gif)
+
 
 ---
 ### Additional stuff
@@ -254,11 +261,5 @@ Options:
 
 Example usage:
 - Create an image in full hd resolution from (0,10,10), looking at (0,0,-20) with preset 1
-  - `cargo run --bin main -- --look-at-pos=0,0,-20 img --width=1920 --height=1080 --camera-pos=0,10,10 --preset=1`
-
-
-#### Gif creation
-It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif` subcommand` in the [CLI](#command-line-interface). You can specify a center point, where the camera is rotation around in a circle, a radius for the circle, the height of the circle (y-level), a number of images, that should be taken turing one full rotation on the circle and a point to look at.
-The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
-
-![](img/out.gif)
+    ![](img/fullhd.png)
+    `cargo run --bin main -- --look-at-pos=0,0,-20 img --width=1920 --height=1080 --camera-pos=0,10,10 --preset=1`
