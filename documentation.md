@@ -154,8 +154,8 @@ pub struct Light {
     pub intensity: f32,
 }
 ```
+For calculation the intensity of colors, the Phong Model is used. The intensity of colors in regards to the light is calculated as follows:
 
-The intensity of colors in regards to the light is calculated as follows:
 ```rust
 let diffuse_light_intensity = 0;
 let specular_light_intensity = 0;
