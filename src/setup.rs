@@ -1,4 +1,7 @@
-use crate::utils::{vec3, Light, Material, Sphere};
+use crate::utils::{light::Light};
+use crate::utils::vec3::vec3;
+use crate::utils::sphere::Sphere;
+use crate::utils::material::Material;
 use std::collections::HashMap;
 
 pub fn get_materials() -> HashMap<String, Material> {

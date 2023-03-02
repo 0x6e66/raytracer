@@ -1,9 +1,15 @@
 #[allow(non_camel_case_types)]
 #[warn(non_snake_case)]
 #[allow(non_upper_case_globals)]
+
 mod raytracer;
 mod setup;
-mod utils;
+mod utils {
+    pub mod sphere;
+    pub mod light;
+    pub mod material;
+    pub mod vec3;
+}
 
 use clap::{value_parser, Arg, ArgMatches, Command};
 
