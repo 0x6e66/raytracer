@@ -11,13 +11,13 @@ Official documentation on installing cargo can be found [here](https://doc.rust-
 ```bash
 git clone https://github.com/0x6e66/raytracer.git
 cd raytracer
-cargo build --bin main
+cargo build --bin raytracer
 ```
 
 ## Usage
 
 ```bash
-target/debug/main --help
+cargo run --bin raytracer --help
 ```
 
 ## Documentation

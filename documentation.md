@@ -18,6 +18,7 @@
     - [(Optional) Animation](#optional-animation)
     - [Additional stuff](#additional-stuff)
       - [Command line interface](#command-line-interface)
+    - [Example usage](#example-usage)
 
 
 ## Author
@@ -81,13 +82,13 @@ return (false, 0.0);
 ```
 The calculation of the actual color is done in the function `cast_ray`. More on that later.
 
-Image of 5 spheres with command `cargo run --bin main -- --look-at-pos=0,-4,-30 img --width=600 --height=400 -p4 --camera-pos=0,10,0`:
+Image of 5 spheres with command `cargo run --bin raytracer -- --look-at-pos=0,-4,-30 img --width=600 --height=400 -p4 --camera-pos=0,10,0`:
 
 ![](img/5-spheres.png)
 
 ---
 ### (Fundamental) Enhancing camera and rendering loop (10 points)
-The anti-aliasing is implemented in the function `calc_color_at_pixel` as follows:
+The anti-aliasing is implemented in the function `calc_color_at_pixel` as follows (very simplified):
 ```rust
 let color = vec3 {0, 0, 0};
 for i in 0..anti_aliasing_offsets.len() {
@@ -110,6 +111,23 @@ This results in uniformly distributed points inside each pixel. Here are two exa
 
 <img src="img/anti_aliasing_2.png" width=45%> <img src="img/anti_aliasing_3.png" width=45%>
 
+Here are images for 1, 4, 9 and 16 rays per pixel respectively
+<figure>
+  <img src="img/1-ray-per-pixel.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 2 -a 1</code></figcaption>
+</figure>
+<figure>
+  <img src="img/4-ray-per-pixel.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 2 -a 2</code></figcaption>
+</figure> 
+<figure>
+  <img src="img/9-ray-per-pixel.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 2 -a 3</code></figcaption>
+</figure> 
+<figure>
+  <img src="img/16-ray-per-pixel.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 2 -a 4</code></figcaption>
+</figure> 
 
 ---
 ### (Fundamental) Object material: diffuse (15 points)
@@ -139,6 +157,30 @@ The specular color is calculated in the function `cast_ray` of the struct `Raytr
 let specular_color = material.color * specular_light_intensity * material.specular_multiplier;
 ```
 More on the calculation of `specular_light_intensity` [here](#optional-lights-30-points).
+
+
+Here are images rendered with 1,2,4,8 and 16 as recursion limit respectively:
+
+<figure>
+  <img src="img/max-depth-1.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 3 -a 1 -d 1</code></figcaption>
+</figure>
+<figure>
+  <img src="img/max-depth-2.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 3 -a 1 -d 2</code></figcaption>
+</figure> 
+<figure>
+  <img src="img/max-depth-4.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 3 -a 1 -d 4</code></figcaption>
+</figure> 
+<figure>
+  <img src="img/max-depth-8.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 3 -a 1 -d 8</code></figcaption>
+</figure> 
+<figure>
+  <img src="img/max-depth-16.png">
+  <figcaption><code>cargo run --bin raytracer -- img -p 3 -a 1 -d 16</code></figcaption>
+</figure> 
 
 ---
 ### (Optional) Object material: specular transmission (30 points)
@@ -211,11 +253,29 @@ pub fn look_at(from: vec3, to: vec3, vec: vec3) -> vec3 {
 ```
 The function is used for the [gif subcommand](#optional-animation) in the cli. More on the cli [here](#gif-creation)
 
+Here are some pictures with different camera positions:
+
+<figure>
+  <img src="img/camera-pos-1.png">
+  <figcaption><code>cargo run --bin raytracer -- --look-at-pos=0,-4,-30 img --width=600 --height=400 -p4 --camera-pos=0,10,0</code></figcaption>
+</figure>
+<figure>
+  <img src="img/camera-pos-2.png">
+  <figcaption><code>cargo run --bin raytracer -- --look-at-pos=0,-4,-30 img --width=600 --height=400 -p4 --camera-pos=40,10,-40</code></figcaption>
+</figure>
+<figure>
+  <img src="img/camera-pos-3.png">
+  <figcaption><code>cargo run --bin raytracer -- --look-at-pos=0,-4,-30 img --width=600 --height=400 -p4 --camera-pos=-30,10,-20</code></figcaption>
+</figure>
+
 ### (Optional) Animation
 It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif` subcommand in the [CLI](#command-line-interface). You can specify a center point, where the camera is looking at and rotating around (`--look-at-pos`), a radius for the circle (`--radius`), the height of the circle (`--y-level`) and a number of images (`--num-of-images`), that should be taken turing one full rotation on the circle.
 The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
 
-![](img/out.gif)
+<figure>
+  <img src="img/out.gif">
+  <figcaption><code>cargo run --bin raytracer -- gif --width=1920 --height=1080 -a3 -p3 --y-level=25 --radius=25 --num-of-images=200</code></figcaption>
+</figure>
 
 
 ---
@@ -224,12 +284,12 @@ The images are being uniformly distributed on the circle (same distance between 
 #### Command line interface
 The program can be used completely by a easy to use command line interface. Usage:
 ```
-$ cargo run --bin main -- --help
-Usage: main [OPTIONS] [COMMAND]
+$ cargo run --bin raytracer -- --help
+Usage: raytracer [OPTIONS] [COMMAND]
 
 Commands:
   img   create a single image
-  gif   create multiple images, that can be combined into a gif
+  gif   rotates the point around a point and creates a gif
   help  Print this message or the help of the given subcommand(s)
 
 Options:
@@ -238,7 +298,7 @@ Options:
       --height <height>
           Height of the image [default: 400]
   -o, --output <output_path>
-          Path where to store results (creates folder if not found) [default: out]
+          Path where to store results (creates folder if not found) [default: ]
   -d, --max-depth <max_depth>
           Max. depth of reflected rays [default: 4]
   -a, --anti-aliasing <anti_aliasing>
@@ -248,7 +308,7 @@ Options:
       --fov <fov>
           Field of view [default: 1.0]
   -p, --preset <preset>
-          Select preset [1-3] [default: 1]
+          Select preset [1-4] [default: 1]
       --look-at-pos <look_at_pos>
           Set position of point to look at [default: 0,-4,-20]
       --versionize
@@ -259,7 +319,11 @@ Options:
           Print version
 ```
 
-Example usage:
+---
+
+### Example usage
 - Create an image in full hd resolution from (0,10,10), looking at (0,0,-20) with preset 1
-    ![](img/fullhd.png)
-    `cargo run --bin main -- --look-at-pos=0,0,-20 img --width=1920 --height=1080 --camera-pos=0,10,10 --preset=1`
+    <figure>
+    <img src="img/fullhd.png">
+    <figcaption><code>cargo run --bin raytracer -- --look-at-pos=0,0,-20 img --width=1920 --height=1080 --camera-pos=0,10,10 --preset=1</code></figcaption>
+    </figure>

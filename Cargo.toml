@@ -16,5 +16,5 @@ tqdm = "0.4.4"
 
 
 [[bin]]
-name = "main"
+name = "raytracer"
 path = "src/main.rs"
