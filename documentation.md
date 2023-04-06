@@ -270,11 +270,16 @@ Here are some pictures with different camera positions:
 
 ### (Optional) Animation
 It is not an animation of the objects in the scene, but an animation of the camera. This is what is behind the `gif` subcommand in the [CLI](#command-line-interface). You can specify a center point, where the camera is looking at and rotating around (`--look-at-pos`), a radius for the circle (`--radius`), the height of the circle (`--y-level`) and a number of images (`--num-of-images`), that should be taken turing one full rotation on the circle.
-The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point. Example output (preset 3):
+The images are being uniformly distributed on the circle (same distance between neighboring points). For each point a [look-at transformation](#optional-positioning-and-orienting-camera-30-points) is done in order for the camera to always point to the desired point.<br>
+Here are two example gifs:
 
 <figure>
-  <img src="img/out.gif">
-  <figcaption><code>cargo run --bin raytracer -- gif --width=1920 --height=1080 -a3 -p3 --y-level=25 --radius=25 --num-of-images=200</code></figcaption>
+  <img src="img/2023-02-11_174504_out.gif">
+  <figcaption><code>cargo run --bin raytracer -- gif --width=1920 --height=1080 -a3 -p2 --y-level=25 --radius=25 --num-of-images=200</code></figcaption>
+</figure>
+<figure>
+  <img src="img/2023-02-13_041230_out.gif">
+  <figcaption><code>cargo run --bin raytracer -- gif --width=1920 --height=1080 -a3 -p1 --y-level=25 --radius=25 --num-of-images=200</code></figcaption>
 </figure>
 
 
