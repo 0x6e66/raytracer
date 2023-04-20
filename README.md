@@ -17,7 +17,7 @@ cargo build --bin raytracer
 ## Usage
 
 ```bash
-cargo run --bin raytracer --help
+cargo run --bin raytracer -- --help
 ```
 
 ## Documentation
